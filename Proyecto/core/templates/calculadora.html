@@ -1,0 +1,23 @@
+{% extends "body.html" %}
+{% load static %}
+{% block title %}Calculadora agrícola · AgroAsesor{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/calculadora.css' %}">{% endblock %}
+{% block content %}
+<h1 class="page-title">Calculadora agrícola</h1>
+<p class="page-sub">Calcula semillas o insumos: superficie × dosis.</p>
+<div class="toolbar" id="modes">
+    <button class="button" type="button" data-mode="semillas">Semillas</button>
+    <button class="button secondary" type="button" data-mode="insumos">Insumos</button>
+</div>
+<form class="card calc-form" id="calc-form">
+    <label class="field"><span>Predio / potrero</span><select id="plot"></select></label>
+    <label class="field"><span>Cultivo</span><select id="crop"></select></label>
+    <label class="field"><span>Superficie (ha)</span><input id="area" type="number" min="0.01" step="0.01" required></label>
+    <label class="field"><span id="dose-label">Dosis o densidad por hectárea</span><input id="dose" type="number" min="0.01" step="0.01" required></label>
+    <label class="field"><span>Unidad</span><input id="unit" value="kg"></label>
+    <p class="error" id="calc-error"></p>
+    <button class="button" type="submit">Calcular</button>
+</form>
+<section class="card" id="result" hidden></section>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/calculadora.js' %}"></script>{% endblock %}

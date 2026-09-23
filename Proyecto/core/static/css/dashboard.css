@@ -1,0 +1,46 @@
+.title-row, .section-heading, .property-list a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 0.9fr;
+    gap: 16px;
+    margin: 18px 0;
+}
+
+.season { background: linear-gradient(180deg, #f7fbf4, #fff); }
+.activity {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+}
+.check {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: #fff;
+}
+.check.checked { background: var(--green-soft); border-color: var(--green); }
+.quick { text-decoration: none; color: inherit; }
+.quick h3 { margin: 0 0 6px; color: var(--green-dark); }
+.property-list a {
+    text-decoration: none;
+    color: inherit;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+}
+.stat-value { font-size: 1.7rem; display: block; margin: 8px 0 4px; }
+.text-link { color: var(--green); font-weight: 600; text-decoration: none; }
+
+@media (max-width: 1024px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .title-row { flex-direction: column; align-items: flex-start; }
+}

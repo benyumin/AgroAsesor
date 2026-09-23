@@ -1,0 +1,8 @@
+.steps { display: flex; gap: 10px; padding: 0; list-style: none; flex-wrap: wrap; }
+.steps button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 14px; font: inherit; cursor: pointer; }
+.steps .is-active { background: var(--green-dark); color: #fff; }
+.choice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.choice-grid button { padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: #fff; font: inherit; cursor: pointer; text-align: left; }
+.choice-grid button.is-active { border-color: var(--green); background: var(--green-soft); }
+.ficha dt { color: var(--muted); margin-top: 8px; }
+.ficha dd { margin: 0; font-weight: 600; }

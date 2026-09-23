@@ -1,0 +1,24 @@
+{% extends "body.html" %}
+{% load static %}
+{% block title %}Cobertura del terreno · AgroAsesor{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/cobertura.css' %}">{% endblock %}
+{% block content %}
+<h1 class="page-title">Cobertura del terreno</h1>
+<p class="page-sub">Calcula cuánto terreno puedes cubrir con la cantidad que tienes.</p>
+<form class="card grid-2" id="cover-form">
+    <label class="field"><span>Predio / potrero</span><select id="plot"></select></label>
+    <label class="field"><span>Insumo</span><select id="insumo"></select></label>
+    <label class="field"><span>Dosis recomendada (por ha)</span><input id="dose" type="number" min="0.01" step="0.01" required></label>
+    <label class="field"><span>Cantidad disponible</span><input id="stock" type="number" min="0" step="0.01" required></label>
+    <p class="error" id="cover-error"></p>
+</form>
+<section class="card cover-result">
+    <div>
+        <p class="muted" id="cover-label">0% cubierto</p>
+        <div class="cover-grid" id="cover-grid" aria-label="Visualización de cobertura"></div>
+        <p id="cover-text"></p>
+    </div>
+    <aside id="cover-numbers"></aside>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/cobertura.js' %}"></script>{% endblock %}

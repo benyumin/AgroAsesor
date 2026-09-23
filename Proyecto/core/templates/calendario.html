@@ -1,0 +1,18 @@
+{% extends "body.html" %}
+{% load static %}
+{% block title %}Calendario de siembra · AgroAsesor{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/calendario.css' %}">{% endblock %}
+{% block content %}
+<h1 class="page-title">Calendario de siembra</h1>
+<p class="page-sub">Información demostrativa para la Zona Central de Chile.</p>
+<div class="grid-3">
+    <label class="field"><span>Cultivo</span><select id="crop-filter"><option value="">Todos</option></select></label>
+    <label class="field"><span>Año</span><select id="year"><option>2026</option><option>2027</option></select></label>
+    <label class="field"><span>Zona</span><select id="zone"></select></label>
+</div>
+<div class="cal-scroll card">
+    <table class="cal-table" id="cal-table"></table>
+</div>
+<aside class="card" id="cal-detail"></aside>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/calendario.js' %}"></script>{% endblock %}

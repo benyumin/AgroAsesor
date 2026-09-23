@@ -1,0 +1,7 @@
+.results { display: grid; gap: 10px; margin-top: 16px; }
+.result { text-decoration: none; color: inherit; display: block; }
+.kind-cultivo { border-left: 4px solid var(--green); }
+.kind-semilla { border-left: 4px solid var(--amber); }
+.kind-insumo { border-left: 4px solid var(--blue); }
+.kind-problema { border-left: 4px solid var(--red); }
+.kind-predio { border-left: 4px solid #6b8f71; }

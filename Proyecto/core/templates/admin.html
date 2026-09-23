@@ -1,0 +1,15 @@
+{% extends "body.html" %}
+{% load static %}
+{% block title %}Panel admin · AgroAsesor{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/admin.css' %}">{% endblock %}
+{% block content %}
+<h1 class="page-title">Panel admin</h1>
+<p class="page-sub">Catálogos de demostración. Los insumos no vigentes no aparecen como recomendación.</p>
+<div class="grid-4" id="admin-stats"></div>
+<div class="toolbar" id="tabs"></div>
+<section class="card">
+    <form class="grid-2" id="create-form"></form>
+    <div id="table"></div>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/admin.js' %}"></script>{% endblock %}

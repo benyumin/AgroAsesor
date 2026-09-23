@@ -1,0 +1,17 @@
+{% extends "body.html" %}
+{% load static %}
+{% block title %}Búsqueda · AgroAsesor{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/busqueda.css' %}">{% endblock %}
+{% block content %}
+<h1 class="page-title">Búsqueda</h1>
+<p class="page-sub">Busca cultivos, semillas, insumos, problemas y fichas técnicas de demostración.</p>
+<form class="card grid-3" id="search-form">
+    <label class="field"><span>Buscar</span><input id="term" value="{{ query }}" placeholder="mai, maíz, gusano…"></label>
+    <label class="field"><span>Cultivo</span><select id="crop"><option value="">Todos</option></select></label>
+    <label class="field"><span>Problema</span><select id="problem"><option value="">Todos</option></select></label>
+    <label class="field"><span>Tipo de insumo</span><select id="type"><option value="">Todos</option></select></label>
+    <button class="button" type="submit">Buscar</button>
+</form>
+<div id="results" class="results"></div>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/busqueda.js' %}"></script>{% endblock %}

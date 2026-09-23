@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AgroAsesor{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/body.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="app-body">
+    <button class="scrim" type="button" aria-label="Cerrar menú"></button>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="logo" aria-hidden="true"><i data-lucide="sprout"></i></span>
+                <div>
+                    <strong>AgroAsesor</strong>
+                    <small>Tu campo, mejores decisiones</small>
+                </div>
+            </div>
+            <p class="nav-label">Mi espacio agrícola</p>
+            <nav aria-label="Principal">
+                {% for name, label, icon in nav_items %}
+                    {% if name != 'admin_panel' or user.role == 'Administrador' %}
+                    <a href="{% url name %}" class="nav-link{% if current == name %} is-active{% endif %}">
+                        <i data-lucide="{{ icon }}"></i>
+                        <span>{{ label }}</span>
+                    </a>
+                    {% endif %}
+                {% endfor %}
+            </nav>
+            <div class="sidebar-bottom">
+                <span class="status-dot" aria-hidden="true"></span>
+                Prototipo demostrativo
+                <small>CAPSTONE 003D · Duoc UC</small>
+            </div>
+        </aside>
+        <div class="workspace">
+            <header class="topbar">
+                <button class="icon-button hamburger" type="button" data-open-menu aria-label="Abrir menú">
+                    <i data-lucide="menu"></i>
+                </button>
+                <form class="global-search" action="{% url 'busqueda' %}" method="get" role="search">
+                    <i data-lucide="search"></i>
+                    <label class="sr-only" for="q">Buscador global</label>
+                    <input id="q" name="q" value="{{ query }}" placeholder="Buscar cultivos, insumos, predios…">
+                </form>
+                <div class="header-actions">
+                    <div class="popover-anchor">
+                        <button class="icon-button" type="button" data-notes aria-label="Notificaciones">
+                            <i data-lucide="bell"></i>
+                            <i class="note-dot"></i>
+                        </button>
+                        <div class="popover" data-notes-menu>
+                            <h3>Tu resumen pendiente</h3>
+                            <div data-notes-list></div>
+                        </div>
+                    </div>
+                    <div class="popover-anchor">
+                        <button class="profile" type="button" data-profile aria-label="Menú de perfil">
+                            <span class="avatar">{{ initials }}</span>
+                            <span class="profile-info">
+                                {{ user.name }}
+                                <small>{{ user.role }}</small>
+                            </span>
+                            <i data-lucide="chevron-down"></i>
+                        </button>
+                        <div class="popover" data-profile-menu>
+                            <strong>{{ user.name }}</strong>
+                            <p>{{ user.email }}</p>
+                            <a class="button secondary" href="{% url 'logout' %}">Cerrar sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <main>
+                {% block content %}{% endblock %}
+            </main>
+            <footer class="app-footer">
+                AgroAsesor · Zona Central de Chile
+                <span>Herramienta de apoyo. Consulta a un ingeniero agrónomo certificado.</span>
+            </footer>
+        </div>
+    </div>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js"></script>
+    <script src="{% static 'js/data/mock.js' %}"></script>
+    <script src="{% static 'js/services.js' %}"></script>
+    <script src="{% static 'js/layout.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

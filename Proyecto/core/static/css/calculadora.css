@@ -1,0 +1,3 @@
+.calc-form { max-width: 560px; margin-top: 16px; }
+#result { margin-top: 16px; }
+.result-value { font-size: 2rem; color: var(--green-dark); margin: 8px 0; }

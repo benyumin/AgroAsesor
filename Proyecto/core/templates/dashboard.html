@@ -1,0 +1,48 @@
+{% extends "body.html" %}
+{% load static %}
+{% block title %}Inicio · AgroAsesor{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">{% endblock %}
+{% block content %}
+<div class="title-row">
+    <div>
+        <h1 class="page-title">¡Hola {{ first_name }}! 🌱</h1>
+        <p class="page-sub">Un mejor campo comienza con mejores decisiones.</p>
+    </div>
+    <a class="button" href="{% url 'predios' %}">Registrar cultivo</a>
+</div>
+<div class="grid-4" id="stats"></div>
+<div class="dashboard-grid">
+    <section class="card">
+        <div class="section-heading">
+            <div>
+                <h2>Tu campo hoy</h2>
+                <p class="muted">Pequeñas acciones, grandes resultados.</p>
+            </div>
+            <span class="badge amber" id="pending-badge"></span>
+        </div>
+        <div id="activities"></div>
+        <a class="text-link" href="{% url 'calendario' %}">Ver calendario de siembra</a>
+    </section>
+    <section class="card season">
+        <span class="badge">Planifica tu temporada</span>
+        <h2>Cada buena cosecha comienza con un plan.</h2>
+        <p>Define qué sembrar y aprovecha mejor cada rincón de tu terreno.</p>
+        <a class="button light" href="{% url 'predios' %}">Planificar mi siembra</a>
+    </section>
+</div>
+<h2>¿Qué hacemos hoy?</h2>
+<div class="grid-4 quick-actions">
+    <a class="card quick" href="{% url 'calculadora' %}"><h3>Calcular dosis</h3><p>La cantidad justa para tu cultivo</p></a>
+    <a class="card quick" href="{% url 'predios' %}"><h3>Ver predios</h3><p>Explora y organiza tu terreno</p></a>
+    <a class="card quick" href="{% url 'asesor' %}"><h3>Consultar recomendaciones</h3><p>Revisa fichas demostrativas</p></a>
+    <a class="card quick" href="{% url 'reportes' %}"><h3>Generar reporte PDF</h3><p>Lleva tus resultados contigo</p></a>
+</div>
+<section class="card">
+    <div class="section-heading">
+        <h2>Mis predios</h2>
+        <a class="text-link" href="{% url 'predios' %}">Ver todos</a>
+    </div>
+    <div id="predio-list" class="property-list"></div>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/dashboard.js' %}"></script>{% endblock %}

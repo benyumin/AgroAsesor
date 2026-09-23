@@ -1,0 +1,11 @@
+{% extends "body.html" %}
+{% load static %}
+{% block title %}Asesor de insumos · AgroAsesor{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/asesor.css' %}">{% endblock %}
+{% block content %}
+<h1 class="page-title">Asesor de insumos</h1>
+<p class="page-sub">Elige cultivo, problema y tipo de insumo. Las fichas son demostrativas.</p>
+<ol class="steps" id="steps"></ol>
+<section class="card" id="wizard"></section>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/asesor.js' %}"></script>{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "body.html" %}
+{% load static %}
+{% block title %}Predios y potreros · AgroAsesor{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="{% static 'css/predios.css' %}">
+{% endblock %}
+{% block content %}
+<h1 class="page-title">Mis predios y potreros</h1>
+<p class="page-sub">Visualiza, dibuja y planifica tus potreros. Las superficies se calculan en el mapa de demostración.</p>
+<div class="farm-filters">
+    <label class="field"><span>Predio</span><select id="predio-select"></select></label>
+    <label class="field"><span>Potrero</span><select id="plot-select"></select></label>
+    <button class="button" type="button" id="add-predio">Agregar predio</button>
+</div>
+<div class="farm-layout">
+    <section class="card map-card">
+        <div class="map-toolbar" role="toolbar" aria-label="Herramientas del mapa">
+            <button type="button" data-mode="select">Seleccionar</button>
+            <button type="button" data-mode="draw">Dibujar</button>
+            <button type="button" data-mode="edit">Editar</button>
+            <button type="button" data-mode="divide">Dividir</button>
+            <button type="button" data-mode="measure">Medir</button>
+            <button type="button" data-mode="delete">Eliminar</button>
+            <button type="button" id="toggle-base">Vista satélite</button>
+        </div>
+        <p class="map-help" id="map-help">Selecciona un potrero del mapa para consultar su información.</p>
+        <div id="farm-map" class="farm-map" aria-label="Mapa interactivo de potreros"></div>
+        <p class="muted" id="live-area"></p>
+        <div class="toolbar" id="draft-actions"></div>
+        <p class="muted">Polígonos de demostración: no representan límites catastrales oficiales.</p>
+    </section>
+    <aside class="card plan-panel">
+        <h2>Resumen del área</h2>
+        <div id="summary"></div>
+        <h3>¿Qué deseas realizar en esta zona?</h3>
+        <div class="action-cards" id="zone-actions"></div>
+        <h3>Planificación de cultivo</h3>
+        <form id="plan-form">
+            <label class="field"><span>Cultivo</span><select name="crop" id="plan-crop" required></select></label>
+            <label class="field"><span>Variedad</span><input name="variety" id="plan-variety"></label>
+            <label class="field"><span>Fecha de siembra</span><input name="sowing" id="plan-sowing" type="date" required></label>
+            <label class="field"><span>Fecha estimada de cosecha</span><input name="harvest" id="plan-harvest" type="date"></label>
+            <label class="field"><span>Superficie (ha)</span><input name="areaHa" id="plan-area" type="number" min="0.01" step="0.001" required></label>
+            <button class="button" type="submit">Guardar planificación</button>
+            <p class="muted" id="plan-msg"></p>
+        </form>
+    </aside>
+</div>
+<dialog id="predio-dialog">
+    <form method="dialog" id="predio-form" class="dialog-form">
+        <h2>Agregar predio</h2>
+        <label class="field"><span>Nombre</span><input name="name" required></label>
+        <label class="field"><span>Ubicación</span><input name="location" value="Melipilla, Región Metropolitana" required></label>
+        <label class="field"><span>Superficie (ha)</span><input name="area" type="number" min="0.01" step="0.01" required></label>
+        <div class="toolbar">
+            <button class="button" value="ok">Guardar</button>
+            <button class="button secondary" value="cancel">Cancelar</button>
+        </div>
+    </form>
+</dialog>
+<dialog id="crop-dialog">
+    <form method="dialog" id="crop-form" class="dialog-form">
+        <h2>Registrar cultivo</h2>
+        <label class="field"><span>Cultivo</span><select name="crop" id="crop-select"></select></label>
+        <label class="field"><span>Variedad</span><input name="variety"></label>
+        <label class="field"><span>Estado</span><input name="status" value="Planificado"></label>
+        <div class="toolbar">
+            <button class="button" value="ok">Guardar</button>
+            <button class="button secondary" value="cancel">Cancelar</button>
+        </div>
+    </form>
+</dialog>
+{% endblock %}
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/@turf/turf@7.2.0/turf.min.js"></script>
+<script src="{% static 'js/predios-map.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,8 @@
+.cal-scroll { overflow-x: auto; margin: 16px 0; }
+.cal-table { width: 100%; border-collapse: separate; border-spacing: 4px; min-width: 720px; }
+.cal-table th, .cal-table td { padding: 8px 4px; text-align: center; font-size: 0.85rem; }
+.cell { height: 28px; border-radius: 6px; }
+.cell.sow { background: var(--green); }
+.cell.grow { background: #e2c76a; }
+.cell.harvest { background: #b57a3c; }
+.legend span { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; }

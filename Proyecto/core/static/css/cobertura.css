@@ -1,0 +1,6 @@
+.cover-result { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; margin-top: 16px; }
+.cover-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; max-width: 360px; }
+.cover-grid span { height: 22px; border-radius: 4px; background: #d9ddd6; }
+.cover-grid span.ok { background: var(--green-light); }
+.cover-grid span.miss { background: #c9b8b4; }
+@media (max-width: 768px) { .cover-result { grid-template-columns: 1fr; } }

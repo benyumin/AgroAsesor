@@ -1,0 +1,32 @@
+.farm-filters { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+.farm-layout { display: grid; grid-template-columns: 1.4fr 0.8fr; gap: 16px; }
+.farm-map { height: 520px; border-radius: 14px; border: 1px solid var(--line); }
+.map-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.map-toolbar button {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font: inherit;
+    cursor: pointer;
+}
+.map-toolbar button.is-active { background: var(--green-dark); color: #fff; }
+.action-cards { display: grid; gap: 8px; margin: 12px 0 18px; }
+.action-cards button {
+    text-align: left;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font: inherit;
+    cursor: pointer;
+}
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.summary-grid strong { display: block; }
+.dialog-form { padding: 16px; min-width: min(90vw, 360px); }
+.plot-vertex { background: #fff; border: 2px solid #255b37; border-radius: 50%; }
+
+@media (max-width: 1024px) {
+    .farm-layout, .farm-filters { grid-template-columns: 1fr; }
+    .farm-map { height: 380px; }
+}

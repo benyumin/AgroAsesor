@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión · AgroAsesor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/body.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body class="login-body">
+    <section class="login-story">
+        <div class="brand-login">
+            <span class="logo"><i data-lucide="sprout"></i></span>
+            AgroAsesor
+        </div>
+        <p class="eyebrow">El futuro del campo está en tus manos</p>
+        <h1>Mejores decisiones.<br>Un campo con <em>más posibilidades.</em></h1>
+        <p>Un espacio para cuidar tus cultivos, planificar tu temporada y hacer rendir cada hectárea.</p>
+        <ul>
+            <li>Tus predios, en un solo lugar</li>
+            <li>Cálculos claros y sencillos</li>
+            <li>Planificación que crece contigo</li>
+        </ul>
+        <small>CAPSTONE 003D · Duoc UC · Zona Central de Chile</small>
+    </section>
+    <section class="login-form">
+        <span class="badge">Prototipo interactivo</span>
+        <h1>
+            {% if mode == 'register' %}Crea tu cuenta demo
+            {% elif mode == 'recover' %}Recupera tu acceso
+            {% else %}Bienvenido a AgroAsesor{% endif %}
+        </h1>
+        <p>Conecta con lo que más importa: tu campo.</p>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="mode" value="{{ mode }}">
+            {% if mode == 'register' %}
+            <label class="field"><span>Nombre</span><input name="name" required autocomplete="name"></label>
+            {% endif %}
+            <label class="field"><span>Correo electrónico</span>
+                <input name="email" type="email" required autocomplete="username" placeholder="tu@correo.cl">
+            </label>
+            {% if mode != 'recover' %}
+            <div class="password-wrap">
+                <label class="field"><span>Contraseña</span>
+                    <input id="password" name="password" type="password" required autocomplete="current-password">
+                </label>
+                <button class="icon-button eye" type="button" id="toggle-pass" aria-label="Mostrar contraseña">
+                    <i data-lucide="eye"></i>
+                </button>
+            </div>
+            {% endif %}
+            {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+            {% if notice %}<p class="alert" role="status">{{ notice }}</p>{% endif %}
+            <button class="button" type="submit">
+                {% if mode == 'register' %}Crear cuenta demo
+                {% elif mode == 'recover' %}Recuperar contraseña
+                {% else %}Iniciar sesión{% endif %}
+            </button>
+        </form>
+        <div class="login-links">
+            <a href="?mode={% if mode == 'register' %}login{% else %}register{% endif %}">
+                {% if mode == 'register' %}Volver a iniciar sesión{% else %}Crear cuenta{% endif %}
+            </a>
+            <a href="?mode={% if mode == 'recover' %}login{% else %}recover{% endif %}">
+                {% if mode == 'recover' %}Volver{% else %}Recuperar contraseña{% endif %}
+            </a>
+        </div>
+        <aside class="alert demo-box">
+            <strong>Explora la demo</strong>
+            <p>agricultor@agroasesor.cl<br>admin@agroasesor.cl<br>Contraseña: <strong>123456</strong></p>
+            <small>Cuenta local de demostración. Sin envío de correos. Datos de ejemplo en el navegador.</small>
+        </aside>
+    </section>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js"></script>
+    <script>
+      lucide.createIcons();
+      const btn = document.getElementById('toggle-pass');
+      const input = document.getElementById('password');
+      btn?.addEventListener('click', () => {
+        const hidden = input.type === 'password';
+        input.type = hidden ? 'text' : 'password';
+        btn.setAttribute('aria-label', hidden ? 'Ocultar contraseña' : 'Mostrar contraseña');
+      });
+    </script>
+</body>
+</html>
