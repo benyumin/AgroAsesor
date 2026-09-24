@@ -25,15 +25,24 @@
         const kind = phase(item, index);
         return '<td><div class="cell ' + kind + '" title="' + (kind || '') + '"></div></td>';
       }).join('') + '</tr>').join('') + '</tbody>';
-    document.getElementById('cal-detail').innerHTML = '<p class="legend"><span class="cell sow"></span> Siembra <span class="cell grow"></span> Crecimiento <span class="cell harvest"></span> Cosecha</p><p class="muted">Selecciona un cultivo en la tabla para ver el detalle.</p>';
+    document.getElementById('cal-detail').innerHTML = '<h2>Detalle del cultivo</h2><p class="muted">Toca una fila de la tabla. Verás época de siembra, duración del ciclo y notas para la Zona Central.</p><p class="hint">Los colores no son un calendario oficial: son una guía demostrativa.</p>';
+  }
+
+  function showDetail(name) {
+    const item = window.AGRO_MOCK.calendario.find((entry) => entry.name === name);
+    if (!item) return;
+    document.getElementById('cal-detail').innerHTML =
+      '<h2>' + item.name + '</h2>' +
+      '<div class="metric-grid"><div class="metric"><span>Mes de siembra</span><strong>' + item.sow + '</strong></div>' +
+      '<div class="metric"><span>Ciclo</span><strong>' + item.cycle + ' meses</strong></div></div>' +
+      '<p>' + item.notes + '</p><p>Zona: ' + document.getElementById('zone').value + ' · Año ' + document.getElementById('year').value + '</p>';
   }
 
   document.getElementById('cal-table').addEventListener('click', (event) => {
     const row = event.target.closest('tr[data-crop]');
     if (!row) return;
     const item = window.AGRO_MOCK.calendario.find((entry) => entry.name === row.dataset.crop);
-    document.getElementById('cal-detail').innerHTML =
-      '<h2>' + item.name + '</h2><p>Época de siembra: mes ' + item.sow + '</p><p>Ciclo aproximado: ' + item.cycle + ' meses</p><p>Notas técnicas: ' + item.notes + '</p><p>Zona: ' + document.getElementById('zone').value + ' · Año ' + document.getElementById('year').value + '</p>';
+    showDetail(item.name);
   });
   cropFilter.addEventListener('change', render);
   render();

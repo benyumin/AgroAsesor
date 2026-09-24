@@ -44,6 +44,7 @@
     justify-content: center;
 }
 
+.login-form form { background: #fff; border: 1px solid #e3e8e1; border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(30, 61, 40, 0.07); }
 .login-form h1 { color: #1e3d28; margin-bottom: 8px; }
 .password-wrap { position: relative; }
 .password-wrap .eye { position: absolute; right: 8px; top: 30px; }

@@ -4,10 +4,10 @@
   const area = state.predios.reduce((sum, item) => sum + item.area, 0);
   const pending = state.activities.filter((item) => !item.done).length;
   const stats = [
-    ['Predios registrados', state.predios.length, 'Tu campo organizado'],
-    ['Superficie total', AgroService.fmt(area, 1) + ' ha', 'Terreno registrado'],
-    ['Cultivos activos', crops.size, 'Diversidad en tus predios'],
-    ['Recomendaciones pendientes', pending, 'Para revisar esta semana']
+    ['Predios registrados', state.predios.length, 'Santa Rita, La Esperanza y Los Aromos'],
+    ['Superficie total', AgroService.fmt(area, 1) + ' ha', 'Suma de tus tres predios demo'],
+    ['Cultivos activos', crops.size, [...crops].join(', ') || 'Sin cultivos'],
+    ['Recomendaciones pendientes', pending, 'Tareas de esta semana']
   ];
   document.getElementById('stats').innerHTML = stats.map(([label, value, note]) =>
     '<article class="card"><span class="muted">' + label + '</span><strong class="stat-value">' + value + '</strong><small class="muted">' + note + '</small></article>'

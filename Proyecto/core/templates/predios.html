@@ -6,12 +6,17 @@
 <link rel="stylesheet" href="{% static 'css/predios.css' %}">
 {% endblock %}
 {% block content %}
-<h1 class="page-title">Mis predios y potreros</h1>
-<p class="page-sub">Visualiza, dibuja y planifica tus potreros. Las superficies se calculan en el mapa de demostración.</p>
-<div class="farm-filters">
+<div class="page-hero">
+    <div>
+        <h1 class="page-title">Mis predios y potreros</h1>
+        <p class="page-sub">El mapa de la izquierda muestra el terreno. A la derecha ves los datos del potrero y lo que puedes hacer con él.</p>
+    </div>
+    <button class="button" type="button" id="add-predio">Agregar predio</button>
+</div>
+<div class="farm-filters card">
     <label class="field"><span>Predio</span><select id="predio-select"></select></label>
     <label class="field"><span>Potrero</span><select id="plot-select"></select></label>
-    <button class="button" type="button" id="add-predio">Agregar predio</button>
+    <p class="hint">Cambia de predio para ver sus potreros. Luego usa las herramientas: seleccionar, dibujar, editar, medir o dividir.</p>
 </div>
 <div class="farm-layout">
     <section class="card map-card">
@@ -31,9 +36,10 @@
         <p class="muted">Polígonos de demostración: no representan límites catastrales oficiales.</p>
     </section>
     <aside class="card plan-panel">
-        <h2>Resumen del área</h2>
+        <h2>Este potrero</h2>
         <div id="summary"></div>
         <h3>¿Qué deseas realizar en esta zona?</h3>
+        <p class="muted">Cada botón abre una herramienta o registra un dato.</p>
         <div class="action-cards" id="zone-actions"></div>
         <h3>Planificación de cultivo</h3>
         <form id="plan-form">

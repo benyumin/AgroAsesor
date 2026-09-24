@@ -3,21 +3,38 @@
 {% block title %}Reportes PDF · AgroAsesor{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'css/reportes.css' %}">{% endblock %}
 {% block content %}
-<h1 class="page-title">Reportes PDF</h1>
-<p class="page-sub">Elige un resultado guardado y genera un PDF con el disclaimer de AgroAsesor.</p>
-<form class="card" id="report-form">
-    <label class="field"><span>Tipo de reporte</span>
-        <select id="kind">
-            <option value="asesor">Ficha técnica</option>
-            <option value="calculo-semillas">Cálculo de semillas</option>
-            <option value="calculo-insumos">Cálculo de insumos</option>
-            <option value="cobertura">Cobertura</option>
-        </select>
-    </label>
-    <button class="button" type="button" id="preview-btn">Mostrar vista previa</button>
-    <button class="button secondary" type="button" id="pdf-btn">Exportar PDF</button>
-</form>
-<section class="card preview" id="preview"><p class="muted">Genera primero un cálculo, cobertura o ficha para ver la vista previa.</p></section>
+<div class="page-hero">
+    <div>
+        <h1 class="page-title">Reportes PDF</h1>
+        <p class="page-sub">Elige un resultado que ya hayas calculado. Verás una vista previa y podrás descargar un PDF con fecha, predio y el aviso profesional.</p>
+    </div>
+</div>
+<div class="split-layout">
+    <form class="card" id="report-form">
+        <h2>Qué quieres imprimir</h2>
+        <p class="hint">Si el recuadro dice que no hay datos, primero haz el cálculo, la cobertura o la ficha del asesor.</p>
+        <label class="field"><span>Tipo de reporte</span>
+            <select id="kind">
+                <option value="asesor">Ficha técnica del asesor</option>
+                <option value="calculo-semillas">Cálculo de semillas</option>
+                <option value="calculo-insumos">Cálculo de insumos</option>
+                <option value="cobertura">Cobertura del terreno</option>
+            </select>
+        </label>
+        <div class="toolbar">
+            <button class="button" type="button" id="preview-btn">Mostrar vista previa</button>
+            <button class="button secondary" type="button" id="pdf-btn">Exportar PDF</button>
+        </div>
+        <ul class="help-list">
+            <li>El PDF incluye el nombre AgroAsesor, la fecha y el disclaimer.</li>
+            <li>Los datos salen de lo último que guardaste en esta misma computadora.</li>
+        </ul>
+    </form>
+    <section class="card preview" id="preview">
+        <h2>Vista previa</h2>
+        <p class="muted">Pulsa “Mostrar vista previa” para ver el contenido antes de descargar.</p>
+    </section>
+</div>
 {% endblock %}
 {% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>

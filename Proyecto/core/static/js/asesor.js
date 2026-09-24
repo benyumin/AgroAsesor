@@ -26,7 +26,9 @@
     ).join('');
     const box = document.getElementById('wizard');
     if (step < 3) {
-      box.innerHTML = '<h2>' + labels[step] + '</h2><div class="choice-grid">' +
+      box.innerHTML = '<p class="hint">Paso ' + (step + 1) + ' de 4</p><h2>' + labels[step] + '</h2><p class="muted">' +
+        ['Toca el cultivo que quieres consultar.', '¿Qué problema ves en el cultivo?', '¿Qué tipo de producto buscas?'][step] +
+        '</p><div class="choice-grid">' +
         (options().length ? options().map((value) => '<button type="button" data-value="' + value + '">' + value + '</button>').join('') : '<p class="muted">No hay opciones vigentes para esta combinación.</p>') +
         '</div>';
       return;

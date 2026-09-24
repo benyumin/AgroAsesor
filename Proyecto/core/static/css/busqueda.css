@@ -1,5 +1,6 @@
-.results { display: grid; gap: 10px; margin-top: 16px; }
-.result { text-decoration: none; color: inherit; display: block; }
+.results { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 16px; }
+.result { text-decoration: none; color: inherit; display: block; min-height: 120px; }
+.result h3 { margin: 8px 0 4px; color: var(--green-dark); }
 .kind-cultivo { border-left: 4px solid var(--green); }
 .kind-semilla { border-left: 4px solid var(--amber); }
 .kind-insumo { border-left: 4px solid var(--blue); }

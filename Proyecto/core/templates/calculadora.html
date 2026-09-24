@@ -3,21 +3,74 @@
 {% block title %}Calculadora agrícola · AgroAsesor{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'css/calculadora.css' %}">{% endblock %}
 {% block content %}
-<h1 class="page-title">Calculadora agrícola</h1>
-<p class="page-sub">Calcula semillas o insumos: superficie × dosis.</p>
-<div class="toolbar" id="modes">
-    <button class="button" type="button" data-mode="semillas">Semillas</button>
-    <button class="button secondary" type="button" data-mode="insumos">Insumos</button>
+<div class="page-hero">
+    <div>
+        <h1 class="page-title">Calculadora agrícola</h1>
+        <p class="page-sub">Te dice cuánto producto comprar o llevar al potrero. Multiplica la superficie por la dosis de cada hectárea.</p>
+    </div>
+    <a class="button secondary" href="{% url 'cobertura' %}">Ver si me alcanza para el terreno</a>
 </div>
-<form class="card calc-form" id="calc-form">
-    <label class="field"><span>Predio / potrero</span><select id="plot"></select></label>
-    <label class="field"><span>Cultivo</span><select id="crop"></select></label>
-    <label class="field"><span>Superficie (ha)</span><input id="area" type="number" min="0.01" step="0.01" required></label>
-    <label class="field"><span id="dose-label">Dosis o densidad por hectárea</span><input id="dose" type="number" min="0.01" step="0.01" required></label>
-    <label class="field"><span>Unidad</span><input id="unit" value="kg"></label>
-    <p class="error" id="calc-error"></p>
-    <button class="button" type="submit">Calcular</button>
-</form>
-<section class="card" id="result" hidden></section>
+
+<div class="mode-cards" id="modes" role="tablist" aria-label="Qué quieres calcular">
+    <button type="button" data-mode="semillas" class="is-active">
+        <strong>Semillas</strong>
+        <span>Cuántos kilos de semilla necesitas para sembrar el potrero.</span>
+    </button>
+    <button type="button" data-mode="insumos">
+        <strong>Fertilizante u otro insumo</strong>
+        <span>Cuánto producto aplicar según la dosis por hectárea.</span>
+    </button>
+</div>
+
+<div class="split-layout">
+    <form class="card calc-form" id="calc-form">
+        <h2 id="form-title">Calcular semillas</h2>
+        <p class="hint" id="form-hint">Elige el potrero. La superficie se completa sola; puedes ajustarla si no vas a sembrar todo.</p>
+        <label class="field"><span>¿En qué potrero?</span>
+            <select id="plot"></select>
+            <small class="help" id="plot-help">Superficie disponible del potrero.</small>
+        </label>
+        <label class="field"><span>Cultivo</span><select id="crop"></select></label>
+        <div class="grid-2">
+            <label class="field"><span>Superficie a calcular (ha)</span>
+                <input id="area" type="number" min="0.01" step="0.01" required>
+                <small class="help">1 hectárea = 10.000 m²</small>
+            </label>
+            <label class="field"><span id="dose-label">Dosis o densidad por hectárea</span>
+                <input id="dose" type="number" min="0.01" step="0.01" required>
+                <small class="help" id="dose-help">Kilos de semilla por cada hectárea.</small>
+            </label>
+        </div>
+        <label class="field"><span>Unidad del resultado</span>
+            <input id="unit" value="kg">
+            <small class="help">Por ejemplo kg, L o sacos.</small>
+        </label>
+        <p class="muted">Ejemplos rápidos (se copian al formulario):</p>
+        <div class="example-row">
+            <button class="example-chip" type="button" data-ex="4,25,kg">4 ha × 25 kg/ha</button>
+            <button class="example-chip" type="button" data-ex="1.245,2,L">1,245 ha × 2 L/ha</button>
+            <button class="example-chip" type="button" data-ex="12.5,250,kg">12,5 ha × 250 kg/ha</button>
+        </div>
+        <p class="error" id="calc-error" role="alert"></p>
+        <div class="toolbar">
+            <button class="button" type="submit">Calcular ahora</button>
+            <a class="button secondary" href="{% url 'reportes' %}">Llevar a un PDF</a>
+        </div>
+    </form>
+
+    <div class="calc-side">
+        <section class="card result-panel" id="result" aria-live="polite"></section>
+        <section class="card">
+            <h2>Cómo se calcula</h2>
+            <p class="formula-line">Cantidad = superficie × dosis</p>
+            <ul class="help-list">
+                <li>Si tienes 4 ha y usas 25 kg por ha, necesitas 100 kg.</li>
+                <li>No uses números negativos ni dejes campos vacíos.</li>
+                <li>La superficie no puede ser mayor que la del potrero.</li>
+            </ul>
+            <p class="alert">Este cálculo es de apoyo. Confirma la dosis con la etiqueta del producto y un profesional.</p>
+        </section>
+    </div>
+</div>
 {% endblock %}
 {% block extra_js %}<script src="{% static 'js/calculadora.js' %}"></script>{% endblock %}

@@ -3,17 +3,29 @@
 {% block title %}Estimar cosecha · AgroAsesor{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'css/predictor.css' %}">{% endblock %}
 {% block content %}
-<h1 class="page-title">Estimar cosecha</h1>
-<p class="page-sub">Estimación demostrativa basada en datos históricos de referencia.</p>
-<form class="card grid-2" id="predict-form">
-    <label class="field"><span>Cultivo</span><select id="crop"></select></label>
-    <label class="field"><span>Variedad</span><input id="variety" value="Híbrido demo"></label>
-    <label class="field"><span>Zona</span><select id="zone"></select></label>
-    <label class="field"><span>Superficie (ha)</span><input id="area" type="number" min="0.01" step="0.01" required></label>
-    <label class="field"><span>Temporada</span><select id="season"><option>2026-2027</option><option>2025-2026</option></select></label>
-    <p class="error" id="predict-error"></p>
-    <button class="button" type="submit">Estimar cosecha</button>
-</form>
-<section class="card" id="predict-result" hidden></section>
+<div class="page-hero">
+    <div>
+        <h1 class="page-title">Estimar cosecha</h1>
+        <p class="page-sub">Una cifra de referencia para conversar el plan de temporada. No es un modelo de inteligencia artificial ni una consulta en vivo a ODEPA o INIA.</p>
+    </div>
+</div>
+<div class="split-layout">
+    <form class="card" id="predict-form">
+        <h2>Datos del cultivo</h2>
+        <p class="hint">Completa el formulario y pulsa estimar. El resultado aparece al lado, con supuestos y limitaciones.</p>
+        <label class="field"><span>Cultivo</span><select id="crop"></select></label>
+        <label class="field"><span>Variedad</span><input id="variety" value="Híbrido demo"></label>
+        <label class="field"><span>Zona</span><select id="zone"></select></label>
+        <div class="grid-2">
+            <label class="field"><span>Superficie (ha)</span><input id="area" type="number" min="0.01" step="0.01" required></label>
+            <label class="field"><span>Temporada</span><select id="season"><option>2026-2027</option><option>2025-2026</option></select></label>
+        </div>
+        <p class="error" id="predict-error"></p>
+        <button class="button" type="submit">Estimar cosecha</button>
+    </form>
+    <section class="card predict-panel" id="predict-result">
+        <p class="muted">El resultado se mostrará aquí. Ejemplo de lectura: 9,2 ton/ha × 4 ha = 36,8 toneladas.</p>
+    </section>
+</div>
 {% endblock %}
 {% block extra_js %}<script src="{% static 'js/predictor.js' %}"></script>{% endblock %}

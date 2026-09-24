@@ -1,2 +1,10 @@
-.admin-row { display: grid; grid-template-columns: 1.4fr 1fr auto auto; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+#tabs { margin: 12px 0; }
+.admin-row {
+    display: grid;
+    grid-template-columns: 1.6fr 0.8fr auto auto auto;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+}
 @media (max-width: 768px) { .admin-row { grid-template-columns: 1fr; } }

@@ -1,5 +1,6 @@
-.farm-filters { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
-.farm-layout { display: grid; grid-template-columns: 1.4fr 0.8fr; gap: 16px; }
+.farm-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; margin-bottom: 16px; }
+.farm-filters .hint { grid-column: 1 / -1; margin: 0; }
+.farm-layout { display: grid; grid-template-columns: 1.4fr 0.9fr; gap: 16px; }
 .farm-map { height: 520px; border-radius: 14px; border: 1px solid var(--line); }
 .map-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .map-toolbar button {
@@ -11,6 +12,7 @@
     cursor: pointer;
 }
 .map-toolbar button.is-active { background: var(--green-dark); color: #fff; }
+.map-help { background: var(--green-soft); border-radius: 10px; padding: 10px 12px; color: var(--green-dark); }
 .action-cards { display: grid; gap: 8px; margin: 12px 0 18px; }
 .action-cards button {
     text-align: left;
@@ -21,6 +23,8 @@
     font: inherit;
     cursor: pointer;
 }
+.action-cards button small { display: block; color: var(--muted); font-weight: 500; margin-top: 2px; }
+.action-cards button:hover { border-color: var(--green); }
 .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
 .summary-grid strong { display: block; }
 .dialog-form { padding: 16px; min-width: min(90vw, 360px); }

@@ -3,13 +3,24 @@
 {% block title %}Búsqueda · AgroAsesor{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'css/busqueda.css' %}">{% endblock %}
 {% block content %}
-<h1 class="page-title">Búsqueda</h1>
-<p class="page-sub">Busca cultivos, semillas, insumos, problemas y fichas técnicas de demostración.</p>
-<form class="card grid-3" id="search-form">
-    <label class="field"><span>Buscar</span><input id="term" value="{{ query }}" placeholder="mai, maíz, gusano…"></label>
-    <label class="field"><span>Cultivo</span><select id="crop"><option value="">Todos</option></select></label>
-    <label class="field"><span>Problema</span><select id="problem"><option value="">Todos</option></select></label>
-    <label class="field"><span>Tipo de insumo</span><select id="type"><option value="">Todos</option></select></label>
+<div class="page-hero">
+    <div>
+        <h1 class="page-title">Búsqueda</h1>
+        <p class="page-sub">Encuentra predios, cultivos, semillas, problemas e insumos. Puedes escribir solo unas letras, por ejemplo “mai” para Maíz.</p>
+    </div>
+</div>
+<form class="card" id="search-form">
+    <div class="grid-2">
+        <label class="field"><span>Buscar</span><input id="term" value="{{ query }}" placeholder="mai, maíz, gusano, santa…"></label>
+        <label class="field"><span>Cultivo</span><select id="crop"><option value="">Todos</option></select></label>
+        <label class="field"><span>Problema</span><select id="problem"><option value="">Todos</option></select></label>
+        <label class="field"><span>Tipo de insumo</span><select id="type"><option value="">Todos</option></select></label>
+    </div>
+    <div class="example-row">
+        <button class="example-chip" type="button" data-q="mai">mai</button>
+        <button class="example-chip" type="button" data-q="gusano">gusano</button>
+        <button class="example-chip" type="button" data-q="santa">santa</button>
+    </div>
     <button class="button" type="submit">Buscar</button>
 </form>
 <div id="results" class="results"></div>

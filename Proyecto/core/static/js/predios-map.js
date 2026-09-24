@@ -158,17 +158,17 @@
   function renderActions() {
     const plot = selected();
     const actions = [
-      ['crop', 'Registrar cultivo'],
-      ['plan', 'Planificar siembra'],
-      ['calc', 'Calcular insumos y semillas'],
-      ['water', 'Registrar riego'],
-      ['fert', 'Registrar fertilización'],
-      ['pest', 'Reportar plaga o problema'],
-      ['sag', 'Ver recomendaciones técnicas / SAG'],
-      ['divide', 'Dividir potrero']
+      ['crop', 'Registrar cultivo', 'Qué hay sembrado en este potrero'],
+      ['plan', 'Planificar siembra', 'Fechas de siembra y cosecha'],
+      ['calc', 'Calcular insumos y semillas', 'Cuántos kilos o litros necesitas'],
+      ['water', 'Registrar riego', 'Deja una nota de riego'],
+      ['fert', 'Registrar fertilización', 'Deja una nota de fertilizante'],
+      ['pest', 'Reportar plaga o problema', 'Queda en tu lista de Inicio'],
+      ['sag', 'Ver recomendaciones / SAG', 'Ficha demostrativa del asesor'],
+      ['divide', 'Dividir potrero', 'Dibuja un sector dentro del lote']
     ];
-    document.getElementById('zone-actions').innerHTML = actions.map(([id, label]) =>
-      '<button type="button" data-act="' + id + '"' + (plot ? '' : ' disabled') + '>' + label + '</button>'
+    document.getElementById('zone-actions').innerHTML = actions.map(([id, label, help]) =>
+      '<button type="button" data-act="' + id + '"' + (plot ? '' : ' disabled') + '><strong>' + label + '</strong><small>' + help + '</small></button>'
     ).join('');
   }
 

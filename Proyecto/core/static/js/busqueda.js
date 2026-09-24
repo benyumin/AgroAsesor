@@ -33,14 +33,21 @@
       }
       return true;
     });
+    const labels = { cultivo: 'Cultivo', semilla: 'Semilla', insumo: 'Insumo', problema: 'Problema', predio: 'Predio' };
     document.getElementById('results').innerHTML = results.length
-      ? results.map((item) => '<a class="card result kind-' + item.kind + '" href="' + item.href + '"><span class="badge">' + item.kind + '</span><h3>' + item.title + '</h3></a>').join('')
-      : '<p class="muted">No hay coincidencias.</p>';
+      ? results.map((item) => '<a class="card result kind-' + item.kind + '" href="' + item.href + '"><span class="badge">' + (labels[item.kind] || item.kind) + '</span><h3>' + item.title + '</h3><p class="muted">Abrir en la herramienta correspondiente</p></a>').join('')
+      : '<section class="card"><h2>Sin coincidencias</h2><p class="muted">Prueba “mai”, “gusano” o “santa”. También puedes dejar la búsqueda vacía para ver todo el catálogo demo.</p></section>';
   }
 
   document.getElementById('search-form').addEventListener('submit', (event) => {
     event.preventDefault();
     search();
+  });
+  document.querySelectorAll('[data-q]').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      document.getElementById('term').value = chip.dataset.q;
+      search();
+    });
   });
   search();
 })();

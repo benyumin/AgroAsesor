@@ -28,9 +28,12 @@
   }
 
   function renderForm() {
+    const labels = { name: 'Nombre', crop: 'Cultivo', problem: 'Problema', type: 'Tipo', dose: 'Dosis', unit: 'Unidad', sow: 'Mes de siembra', cycle: 'Ciclo (meses)', notes: 'Notas' };
     const section = sections.find((item) => item.id === current);
+    const title = document.getElementById('admin-title');
+    if (title) title.textContent = section.label;
     document.getElementById('create-form').innerHTML = section.fields.map((field) =>
-      '<label class="field"><span>' + field + '</span><input name="' + field + '" required></label>'
+      '<label class="field"><span>' + (labels[field] || field) + '</span><input name="' + field + '" required></label>'
     ).join('') + '<button class="button" type="submit">Crear</button>';
   }
 

@@ -3,9 +3,22 @@
 {% block title %}Asesor de insumos · AgroAsesor{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'css/asesor.css' %}">{% endblock %}
 {% block content %}
-<h1 class="page-title">Asesor de insumos</h1>
-<p class="page-sub">Elige cultivo, problema y tipo de insumo. Las fichas son demostrativas.</p>
+<div class="page-hero">
+    <div>
+        <h1 class="page-title">Asesor de insumos</h1>
+        <p class="page-sub">Un asistente de 4 pasos: cultivo, problema, tipo de producto y ficha. Las fichas son de demostración, no una receta SAG real.</p>
+    </div>
+</div>
 <ol class="steps" id="steps"></ol>
 <section class="card" id="wizard"></section>
+<aside class="card">
+    <h2>Cómo usarlo</h2>
+    <ul class="help-list">
+        <li>Empieza por el cultivo que tienes en el potrero.</li>
+        <li>Elige el problema que estás viendo, por ejemplo gusano cogollero.</li>
+        <li>La ficha muestra dosis de ejemplo. Luego puedes calcular la cantidad o la cobertura.</li>
+    </ul>
+    <p class="alert">Esta recomendación es orientativa y no reemplaza la evaluación de un ingeniero agrónomo certificado.</p>
+</aside>
 {% endblock %}
 {% block extra_js %}<script src="{% static 'js/asesor.js' %}"></script>{% endblock %}

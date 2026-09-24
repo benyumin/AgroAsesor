@@ -17,12 +17,13 @@
     AgroService.saveResult('predictor', { crop, area, ...result, date: new Date().toISOString() });
     document.getElementById('predict-result').hidden = false;
     document.getElementById('predict-result').innerHTML =
-      '<p class="muted">Rendimiento estimado</p><p class="predict-value">' + AgroService.fmt(result.rate, 1) + ' ton/ha</p>' +
-      '<p>Producción estimada: <strong>' + AgroService.fmt(result.production, 1) + ' toneladas</strong></p>' +
+      '<p class="muted">Rendimiento de referencia</p><p class="predict-value">' + AgroService.fmt(result.rate, 1) + ' ton/ha</p>' +
+      '<div class="metric-grid"><div class="metric"><span>Producción estimada</span><strong>' + AgroService.fmt(result.production, 1) + ' t</strong></div>' +
+      '<div class="metric"><span>Superficie</span><strong>' + AgroService.fmt(area, 2) + ' ha</strong></div></div>' +
       '<p>Estimación demostrativa basada en datos históricos de referencia.</p>' +
       '<p class="badge blue">Referencia visual: ODEPA · INIA</p>' +
       '<p class="muted">No se consulta ninguna API en tiempo real.</p>' +
-      '<ul><li>Supuesto: rendimiento medio de referencia por cultivo.</li><li>Limitación: no considera clima, suelo ni manejo real.</li><li>Confianza estimada: ' + result.confidence + '</li><li>Versión del modelo mock: ' + window.AGRO_MOCK.version + '</li></ul>' +
+      '<ul class="help-list"><li>Supuesto: rendimiento medio de referencia por cultivo.</li><li>Limitación: no considera clima, suelo ni manejo real.</li><li>Confianza estimada: ' + result.confidence + '</li><li>Versión del modelo mock: ' + window.AGRO_MOCK.version + '</li></ul>' +
       '<p class="alert">' + window.AGRO_MOCK.disclaimer + '</p>';
   });
 })();

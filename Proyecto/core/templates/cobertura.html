@@ -3,22 +3,71 @@
 {% block title %}Cobertura del terreno · AgroAsesor{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'css/cobertura.css' %}">{% endblock %}
 {% block content %}
-<h1 class="page-title">Cobertura del terreno</h1>
-<p class="page-sub">Calcula cuánto terreno puedes cubrir con la cantidad que tienes.</p>
-<form class="card grid-2" id="cover-form">
-    <label class="field"><span>Predio / potrero</span><select id="plot"></select></label>
-    <label class="field"><span>Insumo</span><select id="insumo"></select></label>
-    <label class="field"><span>Dosis recomendada (por ha)</span><input id="dose" type="number" min="0.01" step="0.01" required></label>
-    <label class="field"><span>Cantidad disponible</span><input id="stock" type="number" min="0" step="0.01" required></label>
-    <p class="error" id="cover-error"></p>
-</form>
-<section class="card cover-result">
+<div class="page-hero">
     <div>
-        <p class="muted" id="cover-label">0% cubierto</p>
-        <div class="cover-grid" id="cover-grid" aria-label="Visualización de cobertura"></div>
-        <p id="cover-text"></p>
+        <h1 class="page-title">Cobertura del terreno</h1>
+        <p class="page-sub">Muestra qué parte del potrero puedes cubrir con el producto que tienes hoy, y cuánto te falta o te sobra.</p>
     </div>
-    <aside id="cover-numbers"></aside>
-</section>
+    <a class="button secondary" href="{% url 'calculadora' %}">Calcular la dosis primero</a>
+</div>
+
+<div class="cover-steps">
+    <article class="card"><strong>1. Elige el potrero</strong><p>Usamos su superficie en hectáreas.</p></article>
+    <article class="card"><strong>2. Indica el producto</strong><p>Dosis por hectárea y cuánto tienes en bodega.</p></article>
+    <article class="card"><strong>3. Mira el terreno</strong><p>Verde = cubierto. Gris = todavía sin cubrir.</p></article>
+</div>
+
+<div class="split-layout">
+    <form class="card" id="cover-form">
+        <h2>Datos del terreno y del producto</h2>
+        <p class="hint">El recálculo es inmediato: cambia un número y el mapa de cobertura se actualiza al tiro.</p>
+        <label class="field"><span>Predio / potrero</span>
+            <select id="plot"></select>
+            <small class="help" id="plot-help">Superficie del potrero seleccionado.</small>
+        </label>
+        <label class="field"><span>Insumo</span>
+            <select id="insumo"></select>
+            <small class="help" id="insumo-help">Ficha demostrativa. No es una receta real.</small>
+        </label>
+        <div class="grid-2">
+            <label class="field"><span>Dosis recomendada (por ha)</span>
+                <input id="dose" type="number" min="0.01" step="0.01" required>
+                <small class="help">Cuánto se aplica en una hectárea.</small>
+            </label>
+            <label class="field"><span>Cantidad que tienes ahora</span>
+                <input id="stock" type="number" min="0" step="0.01" required>
+                <small class="help">Lo que hay en bodega o en el camión.</small>
+            </label>
+        </div>
+        <p class="muted">Prueba estos ejemplos:</p>
+        <div class="example-row">
+            <button class="example-chip" type="button" data-stock="2000">Tengo 2.000 kg</button>
+            <button class="example-chip" type="button" data-stock="800">Tengo 800 kg</button>
+            <button class="example-chip" type="button" data-stock="5000">Tengo 5.000 kg</button>
+        </div>
+        <p class="error" id="cover-error" role="alert"></p>
+        <div class="toolbar">
+            <a class="button secondary" href="{% url 'reportes' %}">Guardar este resultado en PDF</a>
+        </div>
+    </form>
+
+    <section class="card cover-board" aria-live="polite">
+        <div class="cover-head">
+            <div>
+                <p class="cover-kicker" id="cover-plot-name">Terreno</p>
+                <p class="cover-percent" id="cover-label">0% cubierto</p>
+            </div>
+            <p class="legend"><span><i class="ok"></i>Cubierto</span><span><i class="miss"></i>Sin cubrir</span></p>
+        </div>
+        <div class="field-shape" id="field-shape" aria-hidden="true">
+            <div class="field-fill" id="field-fill"></div>
+            <span id="field-caption"></span>
+        </div>
+        <div class="cover-grid" id="cover-grid" aria-label="Visualización de cobertura en cuadrícula"></div>
+        <p id="cover-text"></p>
+        <div class="metric-grid" id="cover-numbers"></div>
+        <p class="alert" id="cover-advice"></p>
+    </section>
+</div>
 {% endblock %}
 {% block extra_js %}<script src="{% static 'js/cobertura.js' %}"></script>{% endblock %}

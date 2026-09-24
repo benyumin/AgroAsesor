@@ -21,6 +21,8 @@
   }
 
   document.getElementById('preview-btn').addEventListener('click', preview);
+  document.getElementById('kind').addEventListener('change', preview);
+  preview();
   document.getElementById('pdf-btn').addEventListener('click', () => {
     const data = payload();
     if (!window.jspdf) { alert('No se pudo cargar el generador de PDF.'); return; }

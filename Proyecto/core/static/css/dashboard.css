@@ -29,8 +29,9 @@
     background: #fff;
 }
 .check.checked { background: var(--green-soft); border-color: var(--green); }
-.quick { text-decoration: none; color: inherit; }
-.quick h3 { margin: 0 0 6px; color: var(--green-dark); }
+.quick { text-decoration: none; color: inherit; min-height: 150px; display: flex; flex-direction: column; gap: 6px; }
+.quick h3 { margin: 4px 0 2px; color: var(--green-dark); }
+.quick:hover { border-color: var(--green); }
 .property-list a {
     text-decoration: none;
     color: inherit;
