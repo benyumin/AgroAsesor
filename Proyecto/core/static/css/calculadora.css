@@ -24,8 +24,7 @@
 .calc-form h2 { margin-bottom: 10px; }
 .calc-side { display: grid; gap: 16px; }
 .result-panel {
-    background: linear-gradient(180deg, #f4faF2, #fff);
-    min-height: 280px;
+    background: linear-gradient(180deg, #f4faf2, #fff);
 }
 .result-kicker { margin: 0; color: var(--muted); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.75rem; }
 .result-value { font-size: 2.4rem; color: var(--green-dark); margin: 6px 0 10px; line-height: 1.1; }

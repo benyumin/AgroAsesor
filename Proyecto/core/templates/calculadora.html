@@ -5,8 +5,8 @@
 {% block content %}
 <div class="page-hero">
     <div>
-        <h1 class="page-title">Calculadora agrícola</h1>
-        <p class="page-sub">Te dice cuánto producto comprar o llevar al potrero. Multiplica la superficie por la dosis de cada hectárea.</p>
+        <h1 class="page-title">Cuánto llevar</h1>
+        <p class="page-sub">Cantidad = superficie del potrero × dosis por hectárea.</p>
     </div>
     <a class="button secondary" href="{% url 'cobertura' %}">Ver si me alcanza para el terreno</a>
 </div>
@@ -58,19 +58,7 @@
         </div>
     </form>
 
-    <div class="calc-side">
-        <section class="card result-panel" id="result" aria-live="polite"></section>
-        <section class="card">
-            <h2>Cómo se calcula</h2>
-            <p class="formula-line">Cantidad = superficie × dosis</p>
-            <ul class="help-list">
-                <li>Si tienes 4 ha y usas 25 kg por ha, necesitas 100 kg.</li>
-                <li>No uses números negativos ni dejes campos vacíos.</li>
-                <li>La superficie no puede ser mayor que la del potrero.</li>
-            </ul>
-            <p class="alert">Este cálculo es de apoyo. Confirma la dosis con la etiqueta del producto y un profesional.</p>
-        </section>
-    </div>
+    <section class="card result-panel" id="result" aria-live="polite"></section>
 </div>
 {% endblock %}
-{% block extra_js %}<script src="{% static 'js/calculadora.js' %}"></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'js/calculadora.js' %}?v=2"></script>{% endblock %}

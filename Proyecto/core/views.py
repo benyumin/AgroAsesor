@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.utils.cache import add_never_cache_headers
 
 DEMO_USERS = {
     'agricultor@agroasesor.cl': {
@@ -13,17 +14,22 @@ DEMO_USERS = {
     },
 }
 
-NAV_ITEMS = [
-    ('dashboard', 'Inicio', 'layout-dashboard'),
-    ('predios', 'Mis predios y potreros', 'map'),
-    ('asesor', 'Asesor de insumos', 'flask-conical'),
-    ('calculadora', 'Calculadora agrícola', 'calculator'),
-    ('cobertura', 'Cobertura del terreno', 'grid-2x2'),
-    ('predictor', 'Predictor de cosecha', 'chart-no-axes-combined'),
-    ('calendario', 'Calendario de siembra', 'calendar-days'),
-    ('busqueda', 'Búsqueda', 'search'),
-    ('reportes', 'Reportes PDF', 'file-text'),
-    ('admin_panel', 'Panel admin', 'shield-check'),
+NAV_GROUPS = [
+    ('El campo', [
+        ('dashboard', 'Hoy', 'layout-dashboard'),
+        ('predios', 'Predios', 'map'),
+        ('calendario', 'Siembra', 'calendar-days'),
+    ]),
+    ('La decisión', [
+        ('calculadora', 'Cuánto llevar', 'calculator'),
+        ('cobertura', 'Si alcanza', 'grid-2x2'),
+        ('predictor', 'Cosecha', 'chart-no-axes-combined'),
+        ('asesor', 'Ficha de insumo', 'flask-conical'),
+    ]),
+    ('Cierre', [
+        ('reportes', 'Reporte', 'file-text'),
+        ('admin_panel', 'Catálogos', 'shield-check'),
+    ]),
 ]
 
 
@@ -48,13 +54,15 @@ def _page(request, template, current, extra=None):
         'user': user,
         'first_name': user.get('name', '').split()[0] if user.get('name') else '',
         'initials': ''.join(parts).upper() or 'AA',
-        'nav_items': NAV_ITEMS,
+        'nav_groups': NAV_GROUPS,
         'current': current,
         'query': request.GET.get('q', ''),
     }
     if extra:
         context.update(extra)
-    return render(request, template, context)
+    response = render(request, template, context)
+    add_never_cache_headers(response)
+    return response
 
 
 def index(request):
@@ -105,6 +113,18 @@ def login_view(request):
 def logout_view(request):
     request.session.pop('user', None)
     return redirect('login')
+
+
+def enter_as_admin(request):
+    if request.method != 'POST':
+        return redirect('login')
+    admin = DEMO_USERS['admin@agroasesor.cl']
+    request.session['user'] = {
+        'email': 'admin@agroasesor.cl',
+        'name': admin['name'],
+        'role': admin['role'],
+    }
+    return redirect('admin_panel')
 
 
 def dashboard(request):

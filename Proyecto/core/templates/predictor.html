@@ -5,14 +5,14 @@
 {% block content %}
 <div class="page-hero">
     <div>
-        <h1 class="page-title">Estimar cosecha</h1>
-        <p class="page-sub">Una cifra de referencia para conversar el plan de temporada. No es un modelo de inteligencia artificial ni una consulta en vivo a ODEPA o INIA.</p>
+        <h1 class="page-title">Cosecha estimada</h1>
+        <p class="page-sub">Toneladas de referencia para este potrero. No consulta clima ni suelo en vivo.</p>
     </div>
 </div>
 <div class="split-layout">
     <form class="card" id="predict-form">
         <h2>Datos del cultivo</h2>
-        <p class="hint">Completa el formulario y pulsa estimar. El resultado aparece al lado, con supuestos y limitaciones.</p>
+        <p class="hint">Cambia el cultivo o la superficie y la cifra se actualiza. Estimar guarda el resultado para el reporte.</p>
         <label class="field"><span>Cultivo</span><select id="crop"></select></label>
         <label class="field"><span>Variedad</span><input id="variety" value="Híbrido demo"></label>
         <label class="field"><span>Zona</span><select id="zone"></select></label>

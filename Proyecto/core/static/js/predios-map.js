@@ -1,6 +1,6 @@
 (function () {
   const help = {
-    select: 'Selecciona un potrero del mapa para consultar su información.',
+    select: 'Toca un potrero en el mapa para ver sus datos.',
     draw: 'Marca los vértices del potrero sobre el mapa.',
     edit: 'Arrastra los vértices. La superficie se actualiza al moverlos.',
     divide: 'Marca los vértices de un sector dentro del potrero seleccionado.',
@@ -56,20 +56,9 @@
     return { areaM2, areaHa: areaM2 / 10000 };
   }
 
-  function fillSelect(select, items, value, extra) {
-    select.innerHTML = (extra || []).concat(items).map((item) =>
-      '<option value="' + item.id + '"' + (item.id === value ? ' selected' : '') + '>' + item.label + '</option>'
-    ).join('');
-  }
-
-  function renderFilters() {
-    fillSelect(document.getElementById('predio-select'), state.predios.map((item) => ({ id: item.id, label: item.name })), predioId);
-    fillSelect(document.getElementById('plot-select'), plotsOfPredio().map((item) => ({ id: item.id, label: item.name })), plotId, [{ id: '', label: 'Selecciona un potrero' }]);
-  }
-
-  function renderMap() {
+  function renderMap(fit) {
     layers.clearLayers();
-    plotsOfPredio().forEach((plot) => {
+    state.plots.forEach((plot) => {
       const active = plot.id === plotId;
       const polygon = L.polygon(toLatLngs(plot.coordinates), {
         color: active ? '#235d37' : '#679369',
@@ -77,19 +66,21 @@
         fillColor: active ? '#75a459' : '#a6c98c',
         fillOpacity: active ? 0.38 : 0.22
       }).addTo(layers);
-      polygon.bindTooltip(plot.name + ' · ' + AgroService.fmt(plot.areaHa || measure(plot.coordinates).areaHa, 3) + ' ha', { sticky: true });
+      const predio = state.predios.find((item) => item.id === plot.predio);
+      polygon.bindTooltip((predio ? predio.name + ' · ' : '') + plot.name, { sticky: true });
       polygon.on('click', (event) => {
         if (mode === 'select') {
+          predioId = plot.predio;
           plotId = plot.id;
-          refresh();
+          refresh(false);
         } else if (['draw', 'divide', 'measure'].includes(mode)) {
           L.DomEvent.stop(event);
           addPoint(event.latlng);
         }
       });
     });
-    const points = plotsOfPredio().flatMap((plot) => toLatLngs(plot.coordinates));
-    if (points.length) map.fitBounds(points, { padding: [36, 36], maxZoom: 17 });
+    const points = state.plots.flatMap((plot) => toLatLngs(plot.coordinates));
+    if (fit && points.length) map.fitBounds(points, { padding: [36, 36], maxZoom: 17 });
   }
 
   function renderDraft() {
@@ -134,10 +125,13 @@
     const plot = selected();
     const predio = state.predios.find((item) => item.id === predioId);
     const box = document.getElementById('summary');
+    const tools = document.getElementById('plot-tools');
     if (!plot) {
-      box.innerHTML = '<p class="muted">Selecciona un potrero o dibuja uno nuevo.</p>';
+      tools.hidden = true;
+      box.innerHTML = '<p class="muted">Toca un potrero en el mapa, o dibuja uno y pulsa Listo.</p>';
       return;
     }
+    tools.hidden = false;
     const metrics = measure(plot.coordinates);
     const areaHa = plot.areaHa || metrics.areaHa;
     const areaM2 = areaHa * 10000;
@@ -186,21 +180,21 @@
     });
     document.getElementById('map-help').textContent = help[mode];
     const actions = document.getElementById('draft-actions');
-    actions.innerHTML = '';
+    actions.hidden = true;
     if (mode === 'delete' && selected() && confirm('¿Eliminar el potrero seleccionado?')) {
       AgroService.removePlot(selected().id);
       state = AgroService.getState();
       plotId = plotsOfPredio()[0]?.id || null;
       mode = 'select';
-      refresh();
+      refresh(false);
       return;
     }
     if (['draw', 'divide', 'measure', 'edit'].includes(mode)) {
-      actions.innerHTML = '<button class="button" type="button" id="finish">Finalizar</button>' +
-        '<button class="button secondary" type="button" id="undo">Deshacer punto</button>' +
-        '<button class="button secondary" type="button" id="cancel">Cancelar</button>';
+      actions.hidden = false;
+      document.getElementById('finish').hidden = mode === 'measure';
     }
     renderDraft();
+    requestAnimationFrame(function () { map.invalidateSize(); });
   }
 
   function addPoint(latlng) {
@@ -252,10 +246,9 @@
     refresh();
   }
 
-  function refresh() {
+  function refresh(fit) {
     state = AgroService.getState();
-    renderFilters();
-    renderMap();
+    renderMap(fit);
     renderSummary();
     renderActions();
     renderCrops();
@@ -263,6 +256,7 @@
       button.classList.toggle('is-active', button.dataset.mode === mode);
     });
     document.getElementById('map-help').textContent = help[mode];
+    document.getElementById('draft-actions').hidden = !['draw', 'divide', 'measure', 'edit'].includes(mode);
     renderDraft();
   }
 
@@ -270,15 +264,6 @@
     if (['draw', 'divide', 'measure'].includes(mode)) addPoint(event.latlng);
   });
 
-  document.getElementById('predio-select').addEventListener('change', (event) => {
-    predioId = event.target.value;
-    plotId = plotsOfPredio()[0]?.id || null;
-    refresh();
-  });
-  document.getElementById('plot-select').addEventListener('change', (event) => {
-    plotId = event.target.value || null;
-    refresh();
-  });
   document.querySelector('.map-toolbar').addEventListener('click', (event) => {
     const modeBtn = event.target.closest('[data-mode]');
     if (modeBtn) setMode(modeBtn.dataset.mode);
@@ -296,11 +281,15 @@
     }
   });
   document.getElementById('draft-actions').addEventListener('click', (event) => {
-    if (event.target.id === 'finish') finishDraft();
-    if (event.target.id === 'undo') { draft.pop(); renderDraft(); }
-    if (event.target.id === 'cancel') { mode = 'select'; draft = []; refresh(); }
+    const id = event.target.closest('button')?.id;
+    if (id === 'finish') finishDraft();
+    if (id === 'undo') { draft.pop(); renderDraft(); }
+    if (id === 'cancel') setMode('select');
   });
-  document.getElementById('add-predio').addEventListener('click', () => document.getElementById('predio-dialog').showModal());
+  document.getElementById('add-predio').addEventListener('click', () => {
+    const dialog = document.getElementById('predio-dialog');
+    dialog.showModal();
+  });
   document.getElementById('predio-form').addEventListener('submit', (event) => {
     if (event.submitter?.value !== 'ok') return;
     const data = new FormData(event.currentTarget);
@@ -310,7 +299,7 @@
     AgroService.addPredio(predio);
     predioId = predio.id;
     plotId = null;
-    refresh();
+    refresh(false);
   });
   document.getElementById('plan-form').addEventListener('submit', (event) => {
     event.preventDefault();
@@ -329,7 +318,8 @@
     refresh();
   });
   document.getElementById('zone-actions').addEventListener('click', (event) => {
-    const act = event.target.dataset.act;
+    const button = event.target.closest('[data-act]');
+    const act = button?.dataset.act;
     if (!act || !selected()) return;
     if (act === 'crop') document.getElementById('crop-dialog').showModal();
     if (act === 'plan') document.getElementById('plan-crop').focus();
@@ -340,7 +330,7 @@
       const detail = prompt('Detalle de la actividad');
       if (!detail) return;
       const current = AgroService.getState();
-      current.activities.push({ id: crypto.randomUUID(), title: event.target.textContent, detail, type: 'Registro', done: false });
+      current.activities.push({ id: crypto.randomUUID(), title: button.querySelector('strong')?.textContent || 'Registro', detail, type: 'Registro', done: false });
       AgroService.saveState(current);
       alert('Actividad registrada en Inicio.');
     }
@@ -349,9 +339,14 @@
     if (event.submitter?.value !== 'ok' || !selected()) return;
     const data = new FormData(event.currentTarget);
     AgroService.updatePlot(plotId, { crop: data.get('crop'), variety: data.get('variety'), status: data.get('status') });
-    refresh();
+    refresh(false);
   });
 
-  refresh();
+  function fitMap() {
+    map.invalidateSize();
+  }
+  window.addEventListener('resize', fitMap);
+  refresh(true);
   setMode('select');
+  requestAnimationFrame(fitMap);
 })();

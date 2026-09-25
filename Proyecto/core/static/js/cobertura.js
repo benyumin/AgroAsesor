@@ -10,6 +10,7 @@
   insumoSelect.innerHTML = AgroService.getInsumos(true).map((item) =>
     '<option value="' + item.id + '">' + item.name + ' · ' + item.crop + '</option>'
   ).join('');
+  if (params.get('plot')) plotSelect.value = params.get('plot');
   if (params.get('insumo')) insumoSelect.value = params.get('insumo');
   else if ([...insumoSelect.options].some((option) => option.value === 'i2')) insumoSelect.value = 'i2';
 

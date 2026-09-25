@@ -6,24 +6,27 @@
     document.getElementById('crop').value = first.crop;
     document.getElementById('area').value = first.areaHa;
   }
-  document.getElementById('predict-form').addEventListener('submit', (event) => {
-    event.preventDefault();
+  function estimate(save) {
     const crop = document.getElementById('crop').value;
     const area = AgroService.positive(document.getElementById('area').value);
     const box = document.getElementById('predict-error');
     box.textContent = '';
     const result = AgroService.predictYield(crop, area);
     if (!result.ok) { box.textContent = result.error; return; }
-    AgroService.saveResult('predictor', { crop, area, ...result, date: new Date().toISOString() });
-    document.getElementById('predict-result').hidden = false;
+    if (save) AgroService.saveResult('predictor', { crop, area, ...result, date: new Date().toISOString() });
     document.getElementById('predict-result').innerHTML =
-      '<p class="muted">Rendimiento de referencia</p><p class="predict-value">' + AgroService.fmt(result.rate, 1) + ' ton/ha</p>' +
+      '<p class="muted">Rendimiento de referencia · ' + crop + '</p><p class="predict-value">' + AgroService.fmt(result.rate, 1) + ' ton/ha</p>' +
       '<div class="metric-grid"><div class="metric"><span>Producción estimada</span><strong>' + AgroService.fmt(result.production, 1) + ' t</strong></div>' +
       '<div class="metric"><span>Superficie</span><strong>' + AgroService.fmt(area, 2) + ' ha</strong></div></div>' +
-      '<p>Estimación demostrativa basada en datos históricos de referencia.</p>' +
-      '<p class="badge blue">Referencia visual: ODEPA · INIA</p>' +
-      '<p class="muted">No se consulta ninguna API en tiempo real.</p>' +
-      '<ul class="help-list"><li>Supuesto: rendimiento medio de referencia por cultivo.</li><li>Limitación: no considera clima, suelo ni manejo real.</li><li>Confianza estimada: ' + result.confidence + '</li><li>Versión del modelo mock: ' + window.AGRO_MOCK.version + '</li></ul>' +
+      '<p class="muted">Referencia de demostración. No considera clima, suelo ni manejo real.</p>' +
       '<p class="alert">' + window.AGRO_MOCK.disclaimer + '</p>';
+  }
+
+  document.getElementById('predict-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    estimate(true);
   });
+  document.getElementById('crop').addEventListener('change', () => estimate(false));
+  document.getElementById('area').addEventListener('input', () => estimate(false));
+  estimate(false);
 })();

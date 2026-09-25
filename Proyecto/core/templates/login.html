@@ -73,6 +73,12 @@
         <aside class="alert demo-box">
             <strong>Explora la demo</strong>
             <p>agricultor@agroasesor.cl<br>admin@agroasesor.cl<br>Contraseña: <strong>123456</strong></p>
+            {% if mode != 'register' and mode != 'recover' %}
+            <form class="demo-login" method="post" action="{% url 'enter_as_admin' %}">
+                {% csrf_token %}
+                <button class="button" type="submit">Ingresar como administrador</button>
+            </form>
+            {% endif %}
             <small>Cuenta local de demostración. Sin envío de correos. Datos de ejemplo en el navegador.</small>
         </aside>
     </section>

@@ -38,6 +38,9 @@
       if (seed) {
         document.getElementById('dose').value = seed.density;
         document.getElementById('unit').value = seed.unit;
+      } else if (!document.getElementById('dose').value) {
+        document.getElementById('dose').value = 25;
+        document.getElementById('unit').value = 'kg';
       }
     } else {
       const insumo = currentInsumo();

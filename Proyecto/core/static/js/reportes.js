@@ -20,7 +20,6 @@
     document.getElementById('preview').innerHTML = '<h2>Vista previa</h2>' + lines(data).map((line) => '<p>' + line + '</p>').join('');
   }
 
-  document.getElementById('preview-btn').addEventListener('click', preview);
   document.getElementById('kind').addEventListener('change', preview);
   preview();
   document.getElementById('pdf-btn').addEventListener('click', () => {

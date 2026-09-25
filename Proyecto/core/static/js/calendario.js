@@ -25,7 +25,7 @@
         const kind = phase(item, index);
         return '<td><div class="cell ' + kind + '" title="' + (kind || '') + '"></div></td>';
       }).join('') + '</tr>').join('') + '</tbody>';
-    document.getElementById('cal-detail').innerHTML = '<h2>Detalle del cultivo</h2><p class="muted">Toca una fila de la tabla. Verás época de siembra, duración del ciclo y notas para la Zona Central.</p><p class="hint">Los colores no son un calendario oficial: son una guía demostrativa.</p>';
+    if (rows[0]) showDetail(rows[0].name);
   }
 
   function showDetail(name) {
@@ -33,7 +33,7 @@
     if (!item) return;
     document.getElementById('cal-detail').innerHTML =
       '<h2>' + item.name + '</h2>' +
-      '<div class="metric-grid"><div class="metric"><span>Mes de siembra</span><strong>' + item.sow + '</strong></div>' +
+      '<div class="metric-grid"><div class="metric"><span>Mes de siembra</span><strong>' + ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][item.sow - 1] + '</strong></div>' +
       '<div class="metric"><span>Ciclo</span><strong>' + item.cycle + ' meses</strong></div></div>' +
       '<p>' + item.notes + '</p><p>Zona: ' + document.getElementById('zone').value + ' · Año ' + document.getElementById('year').value + '</p>';
   }

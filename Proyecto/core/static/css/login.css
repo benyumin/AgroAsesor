@@ -51,6 +51,8 @@
 .login-links { display: flex; justify-content: space-between; margin: 14px 0 18px; }
 .login-links a { color: #3d7a4a; font-weight: 600; text-decoration: none; }
 .demo-box { margin-top: 8px; }
+.demo-login { margin: 12px 0; }
+.demo-login .button { width: 100%; justify-content: center; }
 
 @media (max-width: 900px) {
     .login-body { grid-template-columns: 1fr; }

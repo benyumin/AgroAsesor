@@ -7,6 +7,7 @@ urlpatterns = [
     path('hola-django/', views.index, name='pagina_inicial'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('entrar-admin/', views.enter_as_admin, name='enter_as_admin'),
     path('', views.dashboard, name='dashboard'),
     path('predios/', views.predios, name='predios'),
     path('asesor/', views.asesor, name='asesor'),

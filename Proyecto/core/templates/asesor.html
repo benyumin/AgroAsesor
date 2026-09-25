@@ -5,20 +5,20 @@
 {% block content %}
 <div class="page-hero">
     <div>
-        <h1 class="page-title">Asesor de insumos</h1>
-        <p class="page-sub">Un asistente de 4 pasos: cultivo, problema, tipo de producto y ficha. Las fichas son de demostración, no una receta SAG real.</p>
+        <h1 class="page-title">Ficha de insumo</h1>
+        <p class="page-sub">Cultivo, problema y tipo. La dosis que sale es de ejemplo, no una receta.</p>
     </div>
 </div>
-<ol class="steps" id="steps"></ol>
-<section class="card" id="wizard"></section>
-<aside class="card">
-    <h2>Cómo usarlo</h2>
-    <ul class="help-list">
-        <li>Empieza por el cultivo que tienes en el potrero.</li>
-        <li>Elige el problema que estás viendo, por ejemplo gusano cogollero.</li>
-        <li>La ficha muestra dosis de ejemplo. Luego puedes calcular la cantidad o la cobertura.</li>
-    </ul>
-    <p class="alert">Esta recomendación es orientativa y no reemplaza la evaluación de un ingeniero agrónomo certificado.</p>
-</aside>
+<div class="split-layout">
+    <div>
+        <ol class="steps" id="steps"></ol>
+        <section class="card" id="wizard"></section>
+    </div>
+    <aside class="card">
+        <h2>Qué haces con la ficha</h2>
+        <p>La dosis pasa a <a class="text-link" href="{% url 'calculadora' %}">cuánto llevar</a> o a <a class="text-link" href="{% url 'cobertura' %}">si te alcanza</a>.</p>
+        <p class="alert">Orientativa. No reemplaza a un ingeniero agrónomo certificado.</p>
+    </aside>
+</div>
 {% endblock %}
 {% block extra_js %}<script src="{% static 'js/asesor.js' %}"></script>{% endblock %}

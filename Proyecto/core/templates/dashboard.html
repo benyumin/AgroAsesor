@@ -1,56 +1,35 @@
 {% extends "body.html" %}
 {% load static %}
-{% block title %}Inicio · AgroAsesor{% endblock %}
+{% block title %}Hoy · AgroAsesor{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">{% endblock %}
 {% block content %}
 <div class="page-hero">
     <div>
-        <h1 class="page-title">¡Hola {{ first_name }}! 🌱</h1>
-        <p class="page-sub">Hoy puedes revisar tus potreros, calcular insumos o ver si el producto te alcanza para el terreno.</p>
+        <h1 class="page-title">Hola {{ first_name }}. Hoy decides el potrero, la cantidad y la cosecha.</h1>
+        <p class="page-sub">Cada fila es un potrero real de la demo. Desde ahí calculas lo que debes llevar y si el producto alcanza.</p>
     </div>
-    <a class="button" href="{% url 'predios' %}">Ir a mis predios</a>
+    <a class="button" href="{% url 'predios' %}">Abrir el mapa</a>
 </div>
-<div class="grid-4" id="stats"></div>
-<div class="dashboard-grid">
+<div class="stat-row" id="stats"></div>
+<div class="desk">
     <section class="card">
         <div class="section-heading">
-            <div>
-                <h2>Tu campo hoy</h2>
-                <p class="muted">Marca lo hecho. Lo pendiente queda en notificaciones.</p>
-            </div>
+            <h2>Potreros de la temporada</h2>
+            <a class="text-link" href="{% url 'predios' %}">Ver en el mapa</a>
+        </div>
+        <div id="plot-board"></div>
+    </section>
+    <section class="card desk-today">
+        <div class="section-heading">
+            <h2>Para hoy</h2>
             <span class="badge amber" id="pending-badge"></span>
         </div>
+        <div id="next-step"></div>
         <div id="activities"></div>
-        <a class="text-link" href="{% url 'calendario' %}">Ver calendario de siembra</a>
-    </section>
-    <section class="card season">
-        <span class="badge">Planifica tu temporada</span>
-        <h2>Cada buena cosecha comienza con un plan.</h2>
-        <p>Define qué sembrar, calcula la semilla y revisa si te alcanza el producto para cubrir el potrero.</p>
-        <div class="toolbar">
-            <a class="button light" href="{% url 'predios' %}">Planificar siembra</a>
-            <a class="button secondary" href="{% url 'calculadora' %}">Calcular dosis</a>
-        </div>
+        <h3>Predios</h3>
+        <div id="farm-mini"></div>
+        <a class="text-link" href="{% url 'calendario' %}">Ver fechas de siembra</a>
     </section>
 </div>
-<h2>¿Qué hacemos hoy?</h2>
-<p class="muted">Elige una herramienta. Todas usan los mismos predios de demostración.</p>
-<div class="grid-4 quick-actions">
-    <a class="card quick" href="{% url 'calculadora' %}"><span class="badge">Más usada</span><h3>Calcular dosis</h3><p>Superficie × dosis. Te dice cuántos kilos o litros llevar.</p></a>
-    <a class="card quick" href="{% url 'cobertura' %}"><span class="badge blue">Visual</span><h3>Cobertura del terreno</h3><p>Verde = cubierto. Gris = lo que aún no alcanza.</p></a>
-    <a class="card quick" href="{% url 'predios' %}"><h3>Ver predios</h3><p>Mapa, dibujar potreros y guardar la planificación.</p></a>
-    <a class="card quick" href="{% url 'asesor' %}"><h3>Consultar recomendaciones</h3><p>Fichas demostrativas por cultivo y problema.</p></a>
-    <a class="card quick" href="{% url 'predictor' %}"><h3>Estimar cosecha</h3><p>Una cifra de referencia, no un pronóstico real.</p></a>
-    <a class="card quick" href="{% url 'calendario' %}"><h3>Calendario</h3><p>Cuándo sembrar, crecer y cosechar en la Zona Central.</p></a>
-    <a class="card quick" href="{% url 'busqueda' %}"><h3>Buscar</h3><p>Encuentra cultivos, insumos y predios.</p></a>
-    <a class="card quick" href="{% url 'reportes' %}"><h3>Generar PDF</h3><p>Lleva el último cálculo o ficha impresa.</p></a>
-</div>
-<section class="card">
-    <div class="section-heading">
-        <h2>Mis predios</h2>
-        <a class="text-link" href="{% url 'predios' %}">Abrir el mapa</a>
-    </div>
-    <div id="predio-list" class="property-list"></div>
-</section>
 {% endblock %}
 {% block extra_js %}<script src="{% static 'js/dashboard.js' %}"></script>{% endblock %}

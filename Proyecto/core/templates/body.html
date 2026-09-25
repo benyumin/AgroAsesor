@@ -19,12 +19,13 @@
                 <span class="logo" aria-hidden="true"><i data-lucide="sprout"></i></span>
                 <div>
                     <strong>AgroAsesor</strong>
-                    <small>Tu campo, mejores decisiones</small>
+                    <small>Potrero, cantidad, cosecha</small>
                 </div>
             </div>
-            <p class="nav-label">Mi espacio agrícola</p>
             <nav aria-label="Principal">
-                {% for name, label, icon in nav_items %}
+                {% for group, items in nav_groups %}
+                <p class="nav-label">{{ group }}</p>
+                {% for name, label, icon in items %}
                     {% if name != 'admin_panel' or user.role == 'Administrador' %}
                     <a href="{% url name %}" class="nav-link{% if current == name %} is-active{% endif %}">
                         <i data-lucide="{{ icon }}"></i>
@@ -32,7 +33,25 @@
                     </a>
                     {% endif %}
                 {% endfor %}
+                {% endfor %}
             </nav>
+            {% if user.role != 'Administrador' %}
+            <form class="admin-login-form" method="post" action="{% url 'enter_as_admin' %}">
+                {% csrf_token %}
+                <button class="button admin-login-btn" type="submit">
+                    <i data-lucide="log-in"></i>
+                    Ingresar como administrador
+                </button>
+            </form>
+            {% endif %}
+            <div class="sidebar-guide">
+                <p>Así se usa</p>
+                <ol>
+                    <li>Elige el potrero</li>
+                    <li>Calcula la cantidad</li>
+                    <li>Revisa si alcanza y la cosecha</li>
+                </ol>
+            </div>
             <div class="sidebar-bottom">
                 <span class="status-dot" aria-hidden="true"></span>
                 Prototipo demostrativo
@@ -80,10 +99,7 @@
             <main>
                 {% block content %}{% endblock %}
             </main>
-            <footer class="app-footer">
-                AgroAsesor · Zona Central de Chile
-                <span>Herramienta de apoyo. Consulta a un ingeniero agrónomo certificado.</span>
-            </footer>
+            <footer class="app-footer">AgroAsesor · Zona Central · Apoyo al agricultor. No reemplaza a un ingeniero agrónomo.</footer>
         </div>
     </div>
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js"></script>

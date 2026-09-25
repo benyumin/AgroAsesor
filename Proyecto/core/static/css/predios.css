@@ -1,17 +1,84 @@
-.farm-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; margin-bottom: 16px; }
-.farm-filters .hint { grid-column: 1 / -1; margin: 0; }
-.farm-layout { display: grid; grid-template-columns: 1.4fr 0.9fr; gap: 16px; }
-.farm-map { height: 520px; border-radius: 14px; border: 1px solid var(--line); }
-.map-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+body:has(.farm-layout) .workspace { height: 100dvh; overflow: hidden; }
+body:has(.farm-layout) main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+body:has(.farm-layout) .app-footer { display: none; }
+body:has(.farm-layout) .page-hero { margin-bottom: 10px; }
+
+.farm-layout {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+    gap: 12px;
+    align-items: stretch;
+}
+.map-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+}
+.farm-map {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+}
+.plan-panel {
+    min-height: 0;
+    max-height: 100%;
+    overflow: auto;
+}
+.map-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
 .map-toolbar button {
+    flex: 0 0 auto;
     border: 1px solid var(--line);
     background: #fff;
+    color: var(--ink);
     border-radius: 10px;
-    padding: 8px 10px;
+    padding: 8px 12px;
+    min-height: 40px;
     font: inherit;
+    font-weight: 600;
     cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
 }
-.map-toolbar button.is-active { background: var(--green-dark); color: #fff; }
+.map-toolbar button:hover { border-color: var(--green); background: var(--green-soft); }
+.map-toolbar #toggle-base { margin-left: auto; }
+.draft-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    background: #fff8e6;
+    border: 1px solid #ead9a0;
+    border-radius: 12px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+.draft-bar[hidden], .draft-bar [hidden] { display: none; }
+.draft-bar .button { min-height: 40px; justify-content: center; }
+.draft-bar .draft-done {
+    min-width: 120px;
+    background: var(--green);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(61, 122, 74, 0.35);
+}
+.draft-bar .draft-done:hover { background: var(--green-dark); }
+#live-area:empty { display: none; margin: 0; }
+.map-toolbar button.is-active { background: var(--green-dark); border-color: var(--green-dark); color: #fff; }
 .map-help { background: var(--green-soft); border-radius: 10px; padding: 10px 12px; color: var(--green-dark); }
 .action-cards { display: grid; gap: 8px; margin: 12px 0 18px; }
 .action-cards button {
@@ -27,10 +94,53 @@
 .action-cards button:hover { border-color: var(--green); }
 .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
 .summary-grid strong { display: block; }
-.dialog-form { padding: 16px; min-width: min(90vw, 360px); }
+dialog {
+    border: 0;
+    padding: 0;
+    border-radius: 16px;
+    width: min(92vw, 400px);
+    max-height: calc(100dvh - 16px);
+    box-shadow: var(--shadow);
+}
+dialog:modal {
+    position: fixed;
+    top: max(8px, env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    width: min(92vw, 400px);
+    max-height: calc(100dvh - 16px);
+    overflow: auto;
+}
+dialog::backdrop { background: rgba(20, 32, 24, 0.45); }
+.dialog-form { padding: 16px; }
+.dialog-form h2 { margin-top: 0; }
+.dialog-form .field:last-of-type { margin-bottom: 0; }
+.dialog-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding-top: 12px;
+}
+.dialog-actions .button { justify-content: center; }
 .plot-vertex { background: #fff; border: 2px solid #255b37; border-radius: 50%; }
 
 @media (max-width: 1024px) {
-    .farm-layout, .farm-filters { grid-template-columns: 1fr; }
-    .farm-map { height: 380px; }
+    body:has(.farm-layout) .workspace { height: auto; overflow: visible; }
+    body:has(.farm-layout) main { display: block; overflow: visible; }
+    body:has(.farm-layout) .app-footer { display: block; }
+    .farm-layout { display: flex; flex-direction: column; height: auto; }
+    .map-card { height: auto; overflow: visible; }
+    .farm-map { height: 52vh; min-height: 260px; flex: none; }
+    .plan-panel { max-height: none; overflow: visible; }
+    .page-hero .button { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 768px) {
+    .map-toolbar button, .draft-actions .button { min-height: 44px; }
+    dialog:modal { width: calc(100vw - 16px); }
+    .action-cards button { min-height: 44px; }
 }

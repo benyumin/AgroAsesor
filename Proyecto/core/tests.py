@@ -16,6 +16,13 @@ class AgroPagesTests(TestCase):
         follow = self.client.get('/')
         self.assertEqual(follow.status_code, 200)
 
+    def test_enter_as_admin_button(self):
+        response = self.client.post('/entrar-admin/')
+        self.assertRedirects(response, '/panel-admin/')
+        panel = self.client.get('/panel-admin/')
+        self.assertEqual(panel.status_code, 200)
+        self.assertContains(panel, 'Panel admin')
+
     def test_admin_hidden_for_farmer(self):
         self.client.post('/login/', {
             'email': 'agricultor@agroasesor.cl',
