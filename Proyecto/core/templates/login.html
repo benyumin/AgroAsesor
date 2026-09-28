@@ -4,93 +4,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión · AgroAsesor</title>
+    <title>
+        {% if mode == 'register' %}Crear cuenta
+        {% elif mode == 'recover' %}Recuperar contraseña
+        {% elif mode == 'reset' %}Restablecer contraseña
+        {% else %}Iniciar sesión{% endif %}
+        · AgroAsesor
+    </title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/body.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
-<body class="login-body">
-    <section class="login-story">
-        <div class="brand-login">
-            <span class="logo"><i data-lucide="sprout"></i></span>
-            AgroAsesor
-        </div>
-        <p class="eyebrow">El futuro del campo está en tus manos</p>
-        <h1>Mejores decisiones.<br>Un campo con <em>más posibilidades.</em></h1>
-        <p>Un espacio para cuidar tus cultivos, planificar tu temporada y hacer rendir cada hectárea.</p>
-        <ul>
-            <li>Tus predios, en un solo lugar</li>
-            <li>Cálculos claros y sencillos</li>
-            <li>Planificación que crece contigo</li>
-        </ul>
-        <small>CAPSTONE 003D · Duoc UC · Zona Central de Chile</small>
-    </section>
-    <section class="login-form">
-        <span class="badge">Prototipo interactivo</span>
-        <h1>
-            {% if mode == 'register' %}Crea tu cuenta demo
-            {% elif mode == 'recover' %}Recupera tu acceso
-            {% else %}Bienvenido a AgroAsesor{% endif %}
-        </h1>
-        <p>Conecta con lo que más importa: tu campo.</p>
-        <form method="post" novalidate>
-            {% csrf_token %}
-            <input type="hidden" name="mode" value="{{ mode }}">
-            {% if mode == 'register' %}
-            <label class="field"><span>Nombre</span><input name="name" required autocomplete="name"></label>
-            {% endif %}
-            <label class="field"><span>Correo electrónico</span>
-                <input name="email" type="email" required autocomplete="username" placeholder="tu@correo.cl">
-            </label>
-            {% if mode != 'recover' %}
-            <div class="password-wrap">
-                <label class="field"><span>Contraseña</span>
-                    <input id="password" name="password" type="password" required autocomplete="current-password">
-                </label>
-                <button class="icon-button eye" type="button" id="toggle-pass" aria-label="Mostrar contraseña">
-                    <i data-lucide="eye"></i>
-                </button>
+<body class="access-body">
+    <main class="access-shell">
+        <section class="access-visual" aria-hidden="true">
+            <div class="access-brand">
+                <span class="access-logo" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M8 13c0-4 2-8 4-10 2 2 4 6 4 10"/><path d="M7 16h10"/></svg>
+                </span>
+                <div>
+                    <strong>AgroAsesor</strong>
+                    <small>Gestión agrícola inteligente</small>
+                </div>
             </div>
+            <div class="access-copy">
+                <h2>{{ headline }}</h2>
+                <div class="access-meta">
+                    <span>Melipilla, Chile</span>
+                    <span>Módulo de Acceso v2.1</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="access-panel">
+            {% if mode == 'login' %}
+            <h1>Iniciar Sesión</h1>
+            <p class="lead">Ingresa tus credenciales profesionales para acceder a la plataforma agrícola.</p>
+            {% elif mode == 'register' %}
+            <h1>Crear Cuenta</h1>
+            <p class="lead">Formulario exclusivo para registro de agricultores y productores locales.</p>
+            {% elif mode == 'recover' %}
+            <h1>Recuperar Contraseña</h1>
+            <p class="lead">Ingresa tu correo electrónico y te enviaremos las instrucciones para restablecer tu contraseña.</p>
+            {% else %}
+            <h1>Restablecer Contraseña</h1>
+            <p class="lead">Por favor, escribe una nueva contraseña que sea segura y difícil de adivinar para proteger tu cuenta de AgroAsesor.</p>
             {% endif %}
-            {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
-            {% if notice %}<p class="alert" role="status">{{ notice }}</p>{% endif %}
-            <button class="button" type="submit">
-                {% if mode == 'register' %}Crear cuenta demo
-                {% elif mode == 'recover' %}Recuperar contraseña
-                {% else %}Iniciar sesión{% endif %}
-            </button>
-        </form>
-        <div class="login-links">
-            <a href="?mode={% if mode == 'register' %}login{% else %}register{% endif %}">
-                {% if mode == 'register' %}Volver a iniciar sesión{% else %}Crear cuenta{% endif %}
-            </a>
-            <a href="?mode={% if mode == 'recover' %}login{% else %}recover{% endif %}">
-                {% if mode == 'recover' %}Volver{% else %}Recuperar contraseña{% endif %}
-            </a>
-        </div>
-        <aside class="alert demo-box">
-            <strong>Explora la demo</strong>
-            <p>agricultor@agroasesor.cl<br>admin@agroasesor.cl<br>Contraseña: <strong>123456</strong></p>
-            {% if mode != 'register' and mode != 'recover' %}
-            <form class="demo-login" method="post" action="{% url 'enter_as_admin' %}">
+
+            <form method="post" novalidate class="access-form">
                 {% csrf_token %}
-                <button class="button" type="submit">Ingresar como administrador</button>
+                <input type="hidden" name="mode" value="{{ mode }}">
+
+                {% if mode == 'register' %}
+                <label class="field">
+                    <span>Nombre completo</span>
+                    <input name="name" required autocomplete="name" placeholder="Juan Pérez González" value="{{ form.name }}">
+                </label>
+                <div class="row-2">
+                    <label class="field">
+                        <span>RUT</span>
+                        <input name="rut" required placeholder="12.345.678-9" value="{{ form.rut }}">
+                    </label>
+                    <label class="field">
+                        <span>Teléfono</span>
+                        <input name="phone" required autocomplete="tel" placeholder="+56 9 1234 5678" value="{{ form.phone }}">
+                    </label>
+                </div>
+                {% endif %}
+
+                {% if mode != 'reset' %}
+                <label class="field">
+                    <span>Correo electrónico</span>
+                    <input name="email" type="email" required autocomplete="username" placeholder="ejemplo@agroasesor.cl" value="{{ form.email }}">
+                </label>
+                {% endif %}
+
+                {% if mode == 'register' %}
+                <label class="field">
+                    <span>Comuna</span>
+                    <select name="comuna">
+                        {% for comuna in comunas %}
+                        <option value="{{ comuna }}"{% if form.comuna == comuna %} selected{% endif %}>{{ comuna }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                {% endif %}
+
+                {% if mode == 'login' %}
+                <label class="field">
+                    <span>Contraseña</span>
+                    <span class="pass-box">
+                        <input id="password" name="password" type="password" required autocomplete="current-password">
+                        <button class="eye" type="button" data-eye="password" aria-label="Mostrar contraseña"></button>
+                    </span>
+                </label>
+                <a class="forgot" href="?mode=recover">¿Olvidaste tu contraseña?</a>
+                {% elif mode == 'register' %}
+                <div class="row-2">
+                    <label class="field">
+                        <span>Contraseña</span>
+                        <span class="pass-box">
+                            <input id="password" name="password" type="password" required autocomplete="new-password">
+                            <button class="eye" type="button" data-eye="password" aria-label="Mostrar contraseña"></button>
+                        </span>
+                    </label>
+                    <label class="field">
+                        <span>Confirmar contraseña</span>
+                        <span class="pass-box">
+                            <input id="password2" name="password2" type="password" required autocomplete="new-password">
+                            <button class="eye" type="button" data-eye="password2" aria-label="Mostrar contraseña"></button>
+                        </span>
+                    </label>
+                </div>
+                {% elif mode == 'reset' %}
+                <label class="field">
+                    <span>Nueva contraseña</span>
+                    <span class="pass-box">
+                        <input id="password" name="password" type="password" required autocomplete="new-password">
+                        <button class="eye" type="button" data-eye="password" aria-label="Mostrar contraseña"></button>
+                    </span>
+                </label>
+                <label class="field">
+                    <span>Confirmar nueva contraseña</span>
+                    <span class="pass-box">
+                        <input id="password2" name="password2" type="password" required autocomplete="new-password">
+                        <button class="eye" type="button" data-eye="password2" aria-label="Mostrar contraseña"></button>
+                    </span>
+                </label>
+                {% endif %}
+
+                {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+                {% if notice %}<p class="notice" role="status">{{ notice }}</p>{% endif %}
+
+                <button class="submit" type="submit">
+                    {% if mode == 'register' %}Registrarse
+                    {% elif mode == 'recover' %}Enviar instrucciones
+                    {% elif mode == 'reset' %}Guardar nueva contraseña
+                    {% else %}Ingresar{% endif %}
+                </button>
             </form>
+
+            {% if mode == 'login' %}
+            <p class="switch">¿No tienes cuenta? <a href="?mode=register">Regístrate aquí</a></p>
+            <form method="post" action="{% url 'enter_as_admin' %}" class="admin-entry">
+                {% csrf_token %}
+                <button type="submit">Ingresar como administrador</button>
+            </form>
+            <p class="demo-hint">Demo: agricultor@agroasesor.cl · 123456</p>
+            {% elif mode == 'register' %}
+            <p class="switch">¿Ya tienes cuenta? <a href="?mode=login">Inicia sesión</a></p>
+            {% else %}
+            <p class="switch back"><a href="?mode=login">← Volver al inicio de sesión</a></p>
             {% endif %}
-            <small>Cuenta local de demostración. Sin envío de correos. Datos de ejemplo en el navegador.</small>
-        </aside>
-    </section>
-    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js"></script>
+        </section>
+    </main>
     <script>
-      lucide.createIcons();
-      const btn = document.getElementById('toggle-pass');
-      const input = document.getElementById('password');
-      btn?.addEventListener('click', () => {
-        const hidden = input.type === 'password';
-        input.type = hidden ? 'text' : 'password';
-        btn.setAttribute('aria-label', hidden ? 'Ocultar contraseña' : 'Mostrar contraseña');
+      document.querySelectorAll('[data-eye]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const input = document.getElementById(button.dataset.eye);
+          if (!input) return;
+          const hidden = input.type === 'password';
+          input.type = hidden ? 'text' : 'password';
+          button.classList.toggle('is-open', hidden);
+          button.setAttribute('aria-label', hidden ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        });
       });
     </script>
 </body>
