@@ -23,7 +23,7 @@
     const plot = selectedPlot();
     const wanted = params.get('insumo');
     const list = AgroService.getInsumos(true);
-    return list.find((item) => item.id === wanted) ||
+    return list.find((item) => AgroService.sameId(item.id, wanted)) ||
       list.find((item) => item.crop === plot?.crop && item.type !== 'Semilla');
   }
 
@@ -32,9 +32,8 @@
     if (!plot) return;
     document.getElementById('crop').value = plot.crop || document.getElementById('crop').value;
     document.getElementById('area').value = plot.areaHa || '';
-    document.getElementById('plot-help').textContent = 'Superficie disponible: ' + AgroService.fmt(maxArea(), 3) + ' ha · Cultivo actual: ' + (plot.crop || 'sin cultivo');
     if (mode === 'semillas') {
-      const seed = window.AGRO_MOCK.semillas.find((item) => item.crop === plot.crop);
+      const seed = AgroService.getSemilla(plot.crop) || window.AGRO_MOCK.semillas.find((item) => item.crop === plot.crop);
       if (seed) {
         document.getElementById('dose').value = seed.density;
         document.getElementById('unit').value = seed.unit;
@@ -49,6 +48,9 @@
         document.getElementById('unit').value = insumo.unit;
       }
     }
+    const fromDb = AgroService.catalogFromDb();
+    const extra = fromDb ? ' · Dosis del catálogo (base de datos)' : '';
+    document.getElementById('plot-help').textContent = 'Superficie disponible: ' + AgroService.fmt(maxArea(), 3) + ' ha · Cultivo actual: ' + (plot.crop || 'sin cultivo') + extra;
     renderResult(false);
   }
 

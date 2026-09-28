@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.utils.cache import add_never_cache_headers
 
+from .catalog import catalog_payload
+
 DEMO_USERS = {
     'agricultor@agroasesor.cl': {
         'password': '123456',
@@ -57,6 +59,7 @@ def _page(request, template, current, extra=None):
         'nav_groups': NAV_GROUPS,
         'current': current,
         'query': request.GET.get('q', ''),
+        'catalog': catalog_payload(),
     }
     if extra:
         context.update(extra)

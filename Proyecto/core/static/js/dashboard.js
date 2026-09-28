@@ -1,36 +1,67 @@
 (function () {
   const state = AgroService.getState();
   const crops = [...new Set(state.plots.map((plot) => plot.crop).filter(Boolean))];
-  const area = state.predios.reduce((sum, item) => sum + item.area, 0);
+  const area = state.predios.reduce((sum, item) => sum + Number(item.area || 0), 0);
   const pending = state.activities.filter((item) => !item.done).length;
+  const catalogCrops = AgroService.getCultivos().length;
+
   const stats = [
-    ['Predios', state.predios.length],
-    ['Hectáreas', AgroService.fmt(area, 1)],
-    ['Cultivos', crops.length],
-    ['Pendientes', pending]
+    { key: 'predios', label: 'Predios', value: state.predios.length, icon: 'sprout' },
+    { key: 'area', label: 'Hectáreas', value: AgroService.fmt(area, 1), extra: area ? '+12%' : '', icon: 'leaf' },
+    { key: 'crops', label: 'Cultivos', value: catalogCrops || crops.length, icon: 'sprout' },
+    { key: 'pending', label: 'Pendientes', value: pending, icon: 'clipboard-list' }
   ];
-  document.getElementById('stats').innerHTML = stats.map(([label, value]) =>
-    '<article class="card stat"><span class="muted">' + label + '</span><strong class="stat-value">' + value + '</strong></article>'
+
+  document.getElementById('stats').innerHTML = stats.map((item) =>
+    '<article class="card dash-stat ' + item.key + '">' +
+      '<span class="stat-icon"><i data-lucide="' + item.icon + '"></i></span>' +
+      '<div><span class="muted">' + item.label + '</span>' +
+      '<strong class="stat-value">' + item.value + (item.extra ? '<small>' + item.extra + '</small>' : '') + '</strong></div>' +
+    '</article>'
   ).join('');
+
+  function cropClass(name) {
+    const key = String(name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (key.includes('maiz')) return 'maiz';
+    if (key.includes('trigo')) return 'trigo';
+    if (key.includes('alfalfa')) return 'alfalfa';
+    if (key.includes('tomate')) return 'tomate';
+    if (key.includes('papa')) return 'papa';
+    if (key.includes('cebolla')) return 'cebolla';
+    return 'otro';
+  }
+
+  function cropIcon(name) {
+    const klass = cropClass(name);
+    if (klass === 'trigo' || klass === 'maiz') return 'sprout';
+    if (klass === 'alfalfa') return 'leaf';
+    return 'sprout';
+  }
 
   const board = document.getElementById('plot-board');
   board.innerHTML = state.plots.map((plot) => {
     const predio = state.predios.find((item) => item.id === plot.predio);
     const planned = plot.status === 'Planificado';
+    const klass = cropClass(plot.crop);
     return '<article class="plot-row">' +
-      '<div><strong>' + plot.name + '</strong><small class="muted">' + (predio ? predio.name : '') + ' · ' + (plot.crop || 'Sin cultivo') + '</small></div>' +
-      '<span class="badge' + (planned ? ' amber' : '') + '">' + plot.status + '</span>' +
+      '<div class="plot-identity"><span class="plot-thumb ' + klass + '"></span>' +
+        '<div><strong>' + plot.name + '</strong><small class="muted">' + (predio ? predio.name : '') + (plot.crop ? ' · ' + plot.crop : '') + '</small></div></div>' +
+      '<span class="badge' + (planned ? ' amber' : '') + '">' + (plot.status || 'Sin estado') + '</span>' +
       '<span class="plot-area">' + AgroService.fmt(plot.areaHa, 1) + ' ha</span>' +
-      '<span class="plot-actions">' +
-        '<a href="/calculadora/?plot=' + plot.id + '">Cantidad</a>' +
-        '<a href="/cobertura/?plot=' + plot.id + '">Cobertura</a>' +
-      '</span></article>';
+      '<span class="plot-crop"><i data-lucide="' + cropIcon(plot.crop) + '"></i> ' + (plot.crop || '—') + '</span>' +
+      '<span class="plot-actions"><a href="/calculadora/?plot=' + plot.id + '">Cantidad</a></span>' +
+      '<span class="plot-actions"><a href="/cobertura/?plot=' + plot.id + '">Cobertura</a></span>' +
+    '</article>';
   }).join('');
 
   const next = state.plots.find((plot) => plot.status === 'Planificado') || state.plots[0];
   const nextPredio = next && state.predios.find((item) => item.id === next.predio);
   document.getElementById('next-step').innerHTML = next
-    ? '<a class="next-step" href="/calculadora/?plot=' + next.id + '"><span>Siguiente</span><strong>Calcular ' + next.crop + ' en ' + next.name + '</strong><small>' + (nextPredio ? nextPredio.name : '') + ' · ' + AgroService.fmt(next.areaHa, 1) + ' ha</small></a>'
+    ? '<a class="next-step" href="/calculadora/?plot=' + next.id + '">' +
+        '<span class="next-ico"><i data-lucide="' + cropIcon(next.crop) + '"></i></span>' +
+        '<span><span>Siguiente</span><strong>Calcular ' + (next.crop || 'insumo') + ' en ' + next.name + '</strong>' +
+        '<small>' + (nextPredio ? nextPredio.name : '') + ' · ' + AgroService.fmt(next.areaHa, 1) + ' ha</small></span>' +
+        '<i data-lucide="arrow-right"></i></a>'
     : '';
 
   document.getElementById('farm-mini').innerHTML = state.predios.map((item) =>
@@ -54,4 +85,5 @@
     AgroService.toggleActivity(button.dataset.id);
     render();
   });
+  if (window.lucide) window.lucide.createIcons();
 })();

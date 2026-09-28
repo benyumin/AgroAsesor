@@ -5,6 +5,32 @@
     return JSON.parse(JSON.stringify(value));
   }
 
+  function readServerCatalog() {
+    const node = document.getElementById('agro-catalog');
+    if (!node) return null;
+    try {
+      const data = JSON.parse(node.textContent);
+      if (data && data.fromDb) return data;
+    } catch (error) {
+      console.warn('No se pudo leer el catálogo de la base de datos.', error);
+    }
+    return null;
+  }
+
+  function applyCatalog(state, catalog) {
+    if (!catalog || !catalog.fromDb) return state;
+    if (catalog.cultivos) state.cultivos = catalog.cultivos;
+    if (catalog.zonas) state.zonas = catalog.zonas;
+    if (catalog.insumos) state.insumos = catalog.insumos;
+    window.AGRO_MOCK.cultivos = (catalog.cultivos || []).filter((item) => item.active !== false).map((item) => item.name);
+    if (catalog.zonas) window.AGRO_MOCK.zonas = catalog.zonas.map((item) => item.name);
+    if (catalog.insumos) window.AGRO_MOCK.insumos = catalog.insumos;
+    if (catalog.semillas && catalog.semillas.length) window.AGRO_MOCK.semillas = catalog.semillas;
+    if (catalog.yields) window.AGRO_MOCK.yields = catalog.yields;
+    window.AGRO_CATALOG = catalog;
+    return state;
+  }
+
   function seed() {
     return {
       predios: clone(window.AGRO_MOCK.predios),
@@ -25,20 +51,30 @@
   }
 
   function load() {
+    const fresh = seed();
     try {
       const stored = JSON.parse(localStorage.getItem(KEY));
-      if (stored && stored.plots && stored.predios) return stored;
+      if (stored && stored.plots && stored.predios) {
+        fresh.predios = stored.predios;
+        fresh.plots = stored.plots;
+        fresh.activities = stored.activities || fresh.activities;
+        fresh.results = stored.results || {};
+      }
     } catch (error) {
       console.warn('No se pudo leer el estado local.', error);
     }
-    const fresh = seed();
-    save(fresh);
+    applyCatalog(fresh, readServerCatalog());
     return fresh;
   }
 
   function save(state) {
     try {
-      localStorage.setItem(KEY, JSON.stringify(state));
+      localStorage.setItem(KEY, JSON.stringify({
+        predios: state.predios,
+        plots: state.plots,
+        activities: state.activities,
+        results: state.results || {}
+      }));
     } catch (error) {
       console.warn('No se pudo guardar el estado local.', error);
     }
@@ -91,12 +127,20 @@
     return { ok: true, rate, production: rate * area, confidence: 'Media (datos de referencia, no un modelo real).' };
   }
 
+  function sameId(left, right) {
+    return String(left) === String(right);
+  }
+
   const api = {
     getState: load,
     saveState: save,
+    catalogFromDb: () => Boolean(readServerCatalog()),
     getPredios: () => load().predios,
     getPlots: (predioId) => load().plots.filter((plot) => !predioId || plot.predio === predioId),
     getCultivos: () => load().cultivos.filter((item) => item.active !== false).map((item) => item.name || item),
+    getSemilla(crop) {
+      return (window.AGRO_MOCK.semillas || []).find((item) => item.crop === crop) || null;
+    },
     getInsumos: (onlyActive) => load().insumos.filter((item) => !onlyActive || item.active),
     getProblemas: () => load().problemas.filter((item) => item.active !== false),
     calculateCoverage,
@@ -105,6 +149,7 @@
     fmt,
     positive,
     nonNegative,
+    sameId,
     updatePlot(id, values) {
       const state = load();
       state.plots = state.plots.map((plot) => plot.id === id ? { ...plot, ...values } : plot);

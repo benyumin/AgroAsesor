@@ -1,3 +1,4 @@
+from django.core.management import call_command
 from django.test import TestCase
 
 
@@ -36,3 +37,32 @@ class AgroPagesTests(TestCase):
         })
         response = self.client.get('/panel-admin/')
         self.assertEqual(response.status_code, 302)
+
+
+class CatalogSliceTests(TestCase):
+    def setUp(self):
+        call_command('seed_catalog', verbosity=0)
+        self.client.post('/login/', {
+            'email': 'agricultor@agroasesor.cl',
+            'password': '123456',
+            'mode': 'login',
+        })
+
+    def test_dashboard_gets_catalog_from_database(self):
+        response = self.client.get('/')
+        self.assertContains(response, 'dash-hero')
+        catalog = response.context['catalog']
+        self.assertTrue(catalog['fromDb'])
+        names = [item['name'] for item in catalog['cultivos']]
+        self.assertIn('Maíz', names)
+        maize = next(item for item in catalog['cultivos'] if item['name'] == 'Maíz')
+        self.assertEqual(maize['density'], 25.0)
+
+    def test_calculator_page_receives_seed_catalog(self):
+        response = self.client.get('/calculadora/')
+        self.assertEqual(response.status_code, 200)
+        payload = response.context['catalog']
+        self.assertTrue(payload['fromDb'])
+        seeds = {item['crop']: item['density'] for item in payload['semillas']}
+        self.assertEqual(seeds['Maíz'], 25.0)
+        self.assertEqual(seeds['Trigo'], 160.0)

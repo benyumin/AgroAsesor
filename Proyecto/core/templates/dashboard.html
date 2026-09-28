@@ -1,35 +1,52 @@
 {% extends "body.html" %}
 {% load static %}
 {% block title %}Hoy · AgroAsesor{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=4">{% endblock %}
 {% block content %}
-<div class="page-hero">
-    <div>
-        <h1 class="page-title">Hola {{ first_name }}. Hoy decides el potrero, la cantidad y la cosecha.</h1>
-        <p class="page-sub">Cada fila es un potrero real de la demo. Desde ahí calculas lo que debes llevar y si el producto alcanza.</p>
+<div class="dash">
+    <section class="dash-hero">
+        <div>
+            <h1>Hola {{ first_name }}. Hoy decides el potrero, la cantidad y la cosecha.</h1>
+            <p>Cada fila es un potrero real de la demo. Desde ahí calculas lo que debes llevar y si el producto alcanza.</p>
+        </div>
+        <a class="button dash-hero-btn" href="{% url 'predios' %}">
+            <i data-lucide="map"></i>
+            Abrir el mapa
+        </a>
+    </section>
+
+    <div class="dash-stats" id="stats"></div>
+
+    <div class="dash-desk">
+        <section class="card dash-plots">
+            <div class="section-heading">
+                <h2><i data-lucide="sprout"></i> Potreros de la temporada</h2>
+                <a class="text-link" href="{% url 'predios' %}"><i data-lucide="map"></i> Ver en el mapa</a>
+            </div>
+            <div class="plot-head" aria-hidden="true">
+                <span>Potrero</span>
+                <span>Estado</span>
+                <span>Hectáreas</span>
+                <span>Cultivo</span>
+                <span>Cantidad</span>
+                <span>Cobertura</span>
+            </div>
+            <div id="plot-board"></div>
+        </section>
+
+        <aside class="card dash-today">
+            <div class="section-heading">
+                <h2><i data-lucide="calendar-days"></i> Para hoy</h2>
+                <span class="badge amber" id="pending-badge"></span>
+            </div>
+            <div id="next-step"></div>
+            <div id="activities"></div>
+            <h3><i data-lucide="map"></i> Predios</h3>
+            <div id="farm-mini"></div>
+            <a class="text-link" href="{% url 'calendario' %}">Ver fechas de siembra →</a>
+        </aside>
     </div>
-    <a class="button" href="{% url 'predios' %}">Abrir el mapa</a>
-</div>
-<div class="stat-row" id="stats"></div>
-<div class="desk">
-    <section class="card">
-        <div class="section-heading">
-            <h2>Potreros de la temporada</h2>
-            <a class="text-link" href="{% url 'predios' %}">Ver en el mapa</a>
-        </div>
-        <div id="plot-board"></div>
-    </section>
-    <section class="card desk-today">
-        <div class="section-heading">
-            <h2>Para hoy</h2>
-            <span class="badge amber" id="pending-badge"></span>
-        </div>
-        <div id="next-step"></div>
-        <div id="activities"></div>
-        <h3>Predios</h3>
-        <div id="farm-mini"></div>
-        <a class="text-link" href="{% url 'calendario' %}">Ver fechas de siembra</a>
-    </section>
+    <p class="dash-footnote">Cultivando mejores decisiones</p>
 </div>
 {% endblock %}
 {% block extra_js %}<script src="{% static 'js/dashboard.js' %}"></script>{% endblock %}
