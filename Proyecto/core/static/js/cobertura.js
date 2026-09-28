@@ -12,13 +12,16 @@
   ).join('');
   if (params.get('plot')) plotSelect.value = params.get('plot');
   if (params.get('insumo')) insumoSelect.value = params.get('insumo');
-  else if ([...insumoSelect.options].some((option) => option.value === 'i2')) insumoSelect.value = 'i2';
+  else {
+    const fertilizer = AgroService.getInsumos(true).find((item) => Number(item.dose) === 250);
+    if (fertilizer) insumoSelect.value = String(fertilizer.id);
+  }
 
   function selectedPlot() {
     return state.plots.find((item) => item.id === plotSelect.value);
   }
   function selectedInsumo() {
-    return AgroService.getInsumos(true).find((item) => item.id === insumoSelect.value);
+    return AgroService.getInsumos(true).find((item) => AgroService.sameId(item.id, insumoSelect.value));
   }
 
   function sync() {
