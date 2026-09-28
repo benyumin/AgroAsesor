@@ -23,7 +23,12 @@ class AgroPagesTests(TestCase):
         self.assertEqual(panel.status_code, 200)
         self.assertContains(panel, 'Panel admin')
 
-    def test_admin_hidden_for_farmer(self):
+    def test_recover_goes_to_reset(self):
+        response = self.client.post('/login/', {
+            'email': 'agricultor@agroasesor.cl',
+            'mode': 'recover',
+        })
+        self.assertRedirects(response, '/login/?mode=reset')
         self.client.post('/login/', {
             'email': 'agricultor@agroasesor.cl',
             'password': '123456',
