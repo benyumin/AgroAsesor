@@ -1,20 +1,21 @@
 {% extends "body.html" %}
 {% load static %}
 {% block title %}Panel admin · AgroAsesor{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/admin.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/admin.css' %}?v=3">{% endblock %}
 {% block content %}
 <div class="page-hero">
     <div>
         <h1 class="page-title">Catálogos</h1>
-        <p class="page-sub">Un insumo no vigente deja de aparecer en la ficha.</p>
+        <p class="page-sub">Vista del catálogo que alimenta las pantallas del agricultor. La edición definitiva se hace en el administrador de Django.</p>
     </div>
+    <a class="button" href="/admin/">Abrir Django Admin</a>
 </div>
 <div class="grid-4" id="admin-stats"></div>
 <div class="toolbar" id="tabs"></div>
 <section class="card">
     <h2 id="admin-title">Catálogo</h2>
-    <form class="grid-2" id="create-form"></form>
+    <p class="muted" id="admin-hint">Los registros vienen de la base de datos. Un insumo no vigente no aparece en la ficha del agricultor.</p>
     <div id="table"></div>
 </section>
 {% endblock %}
-{% block extra_js %}<script src="{% static 'js/admin.js' %}"></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'js/admin.js' %}?v=3"></script>{% endblock %}

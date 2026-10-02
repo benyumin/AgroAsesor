@@ -43,37 +43,50 @@ window.AGRO_MOCK = {
     { id: 'a3', title: 'Calcular cobertura de fertilizante', detail: 'Sector B · La Esperanza', type: 'Recomendación', done: true }
   ],
   cultivos: ['Maíz', 'Trigo', 'Papa', 'Alfalfa', 'Tomate', 'Cebolla'],
-  zonas: ['Metropolitana', 'O’Higgins', 'Maule', 'Valparaíso'],
+  zonas: ['Metropolitana', 'O’Higgins', 'Maule', 'Ñuble'],
   problemas: [
-    { id: 'pr1', name: 'Gusano cogollero', active: true },
-    { id: 'pr2', name: 'Nutrición', active: true },
-    { id: 'pr3', name: 'Malezas de hoja ancha', active: true }
+    { id: 'pr1', name: 'Gusano cogollero', type: 'Plaga', typeKey: 'plaga', description: 'Larva del cogollo del maíz.', symptoms: 'Hojas agujereadas.', management: 'Revisar plantas jóvenes.', active: true },
+    { id: 'pr2', name: 'Carencia de nitrógeno', type: 'Nutrición', typeKey: 'nutricion', description: 'Plantas pálidas.', active: true },
+    { id: 'pr3', name: 'Malezas de hoja ancha', type: 'Maleza', typeKey: 'maleza', description: 'Competencia en cereal.', active: true },
+    { id: 'pr4', name: 'Tizón tardío', type: 'Enfermedad', typeKey: 'enfermedad', description: 'Hongo en papa.', active: true }
+  ],
+  variedades: [
+    { id: 'v1', name: 'Híbrido demo', crop: 'Maíz', zone: 'Metropolitana', description: 'Ciclo intermedio.', cycleDays: 135 },
+    { id: 'v2', name: 'Industrial demo', crop: 'Tomate', zone: 'Metropolitana', description: 'Industria.', cycleDays: 105 },
+    { id: 'v3', name: 'Demo invierno', crop: 'Trigo', zone: 'Maule', description: 'Trigo de invierno.', cycleDays: 185 }
   ],
   insumos: [
     {
-      id: 'i1', name: 'Insumo demostrativo A', active: true, crop: 'Maíz', problem: 'Gusano cogollero',
-      type: 'Insecticida', ingredient: 'No definido: ficha ficticia', dose: 2, unit: 'L',
-      application: 'Ejemplo de interfaz; no aplicar en terreno.',
-      safety: 'Consultar etiqueta autorizada y un profesional.',
-      source: 'SAG (referencia institucional; ficha no validada)', updated: '2026-09-07'
+      id: 'i1', name: 'Insecticida cogollero demostrativo', active: true, crop: 'Maíz', problem: 'Gusano cogollero',
+      type: 'Insecticida', ingredient: 'Lambda-cihalotrina (demostrativo)', dose: 0.2, unit: 'L', zone: 'Metropolitana',
+      application: 'Mojar el cogollo al atardecer.',
+      safety: 'Usar guantes y mascarilla.',
+      description: 'Uso demostrativo contra larva de cogollero.',
+      source: 'Catálogo demostrativo AgroAsesor', updated: 'septiembre 2026'
     },
     {
-      id: 'i2', name: 'Fertilizante demostrativo B', active: true, crop: 'Trigo', problem: 'Nutrición',
-      type: 'Fertilizante', ingredient: 'Composición ficticia', dose: 250, unit: 'kg',
-      application: 'Ejemplo de cálculo, sin prescripción agronómica.',
-      safety: 'Requiere análisis de suelo y asesoría profesional.',
-      source: 'SAG (referencia institucional; ficha no validada)', updated: '2026-09-07'
+      id: 'i2', name: 'Urea 46% demostrativa', active: true, crop: 'Maíz', problem: 'Carencia de nitrógeno',
+      type: 'Fertilizante', ingredient: 'Nitrógeno ureico 46%', dose: 200, unit: 'kg', zone: 'Maule',
+      application: 'Al voleo e incorporar con riego.',
+      safety: 'No mezclar con semilla.',
+      description: 'Fertilización nitrogenada de referencia.',
+      source: 'Catálogo demostrativo AgroAsesor', updated: 'septiembre 2026'
     },
     {
-      id: 'i3', name: 'Insumo archivado', active: false, crop: 'Maíz', problem: 'Gusano cogollero',
-      type: 'Insecticida', ingredient: 'Ficha no vigente', dose: 1, unit: 'L',
-      application: 'No disponible.', safety: 'No usar.', source: 'SAG (demo)', updated: '2025-01-01'
+      id: 'i3', name: 'Fungicida tizón demostrativo', active: true, crop: 'Papa', problem: 'Tizón tardío',
+      type: 'Fungicida', ingredient: 'Mancozeb (demostrativo)', dose: 2, unit: 'kg', zone: 'O’Higgins',
+      application: 'Preventivo con humedad alta.',
+      safety: 'Usar overol y lentes.',
+      description: 'Protección foliar demostrativa.',
+      source: 'Catálogo demostrativo AgroAsesor', updated: 'septiembre 2026'
     },
     {
-      id: 'i4', name: 'Semilla demostrativa C', active: true, crop: 'Maíz', problem: 'Nutrición',
-      type: 'Semilla', ingredient: 'Híbrido ficticio', dose: 25, unit: 'kg',
-      application: 'Densidad de siembra de ejemplo.', safety: 'Usar semilla certificada cuando corresponda.',
-      source: 'SAG (referencia institucional; ficha no validada)', updated: '2026-08-20'
+      id: 'i4', name: 'Semilla de maíz demostrativa', active: true, crop: 'Maíz', problem: '',
+      type: 'Semilla', ingredient: 'Híbrido de grano', dose: 25, unit: 'kg', zone: 'Metropolitana',
+      application: 'Siembra a 70–75 cm entre hileras.',
+      safety: 'Semilla tratada: no consumir.',
+      description: 'Dosis alineada con el catálogo de cultivos.',
+      source: 'Catálogo demostrativo AgroAsesor', updated: 'septiembre 2026'
     }
   ],
   semillas: [
@@ -82,13 +95,13 @@ window.AGRO_MOCK = {
     { id: 's3', name: 'Papa semilla demo', crop: 'Papa', density: 2500, unit: 'kg' }
   ],
   calendario: [
-    { name: 'Maíz', sow: 9, cycle: 6, notes: 'Zona Central: siembra de primavera. Datos demostrativos.' },
-    { name: 'Trigo', sow: 5, cycle: 7, notes: 'Siembra de otoño-invierno. Datos demostrativos.' },
-    { name: 'Papa', sow: 8, cycle: 5, notes: 'Ajustar según heladas locales. Datos demostrativos.' },
-    { name: 'Alfalfa', sow: 8, cycle: 5, notes: 'Puede cortarse varias veces. Datos demostrativos.' },
-    { name: 'Tomate', sow: 9, cycle: 5, notes: 'Trasplante en recinto protegido si hay frío. Datos demostrativos.' },
-    { name: 'Cebolla', sow: 7, cycle: 6, notes: 'Almácigo y transplante. Datos demostrativos.' }
+    { crop: 'Maíz', variety: 'Híbrido demo', zone: 'Metropolitana', sowStart: 9, sowEnd: 11, harvestStart: 2, harvestEnd: 4, notes: 'Siembra de primavera en Zona Central.' },
+    { crop: 'Trigo', variety: 'Demo invierno', zone: 'Maule', sowStart: 5, sowEnd: 7, harvestStart: 12, harvestEnd: 1, notes: 'Siembra de otoño-invierno.' },
+    { crop: 'Papa', variety: '', zone: 'O’Higgins', sowStart: 8, sowEnd: 10, harvestStart: 12, harvestEnd: 2, notes: 'Papa de primavera.' },
+    { crop: 'Alfalfa', variety: '', zone: 'Maule', sowStart: 3, sowEnd: 5, harvestStart: 9, harvestEnd: 4, notes: 'Establecimiento en otoño.' },
+    { crop: 'Tomate', variety: 'Industrial demo', zone: 'Metropolitana', sowStart: 8, sowEnd: 10, harvestStart: 12, harvestEnd: 3, notes: 'Trasplante de primavera.' },
+    { crop: 'Cebolla', variety: '', zone: 'O’Higgins', sowStart: 6, sowEnd: 8, harvestStart: 1, harvestEnd: 3, notes: 'Almácigo de invierno.' }
   ],
   yields: { Maíz: 9.2, Trigo: 5.5, Papa: 30, Alfalfa: 12, Tomate: 70, Cebolla: 40 },
-  adminStats: { agricultores: 18, cultivos: 6, insumos: 4, consultas: 47 }
+  adminStats: { agricultores: 18, cultivos: 6, insumos: 12, consultas: 47 }
 };

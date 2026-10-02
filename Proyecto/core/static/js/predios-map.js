@@ -1,11 +1,20 @@
 (function () {
   const help = {
-    select: 'Toca un potrero en el mapa para ver sus datos.',
-    draw: 'Marca los vértices del potrero sobre el mapa.',
+    select: 'Toca un potrero en el mapa para ver cultivo, superficie y planificación.',
+    draw: 'Marca los vértices del potrero sobre el mapa. Con tres puntos ya puedes pulsar Listo.',
     edit: 'Arrastra los vértices. La superficie se actualiza al moverlos.',
     divide: 'Marca los vértices de un sector dentro del potrero seleccionado.',
     measure: 'Marca dos o más puntos para medir una distancia.',
     delete: 'Confirma la eliminación del potrero seleccionado.'
+  };
+
+  const CROP_COLORS = {
+    'Maíz': { stroke: '#c9a227', fill: '#e8c85a' },
+    'Trigo': { stroke: '#a67c2a', fill: '#d7b56a' },
+    'Papa': { stroke: '#8b6b4a', fill: '#c4a37a' },
+    'Alfalfa': { stroke: '#3d7a45', fill: '#7fb36a' },
+    'Tomate': { stroke: '#b54a3c', fill: '#e08a7a' },
+    'Cebolla': { stroke: '#8a7a32', fill: '#d6c07a' }
   };
 
   const params = new URLSearchParams(location.search);
@@ -14,23 +23,25 @@
   let plotId = state.plots.find((plot) => plot.predio === predioId)?.id || null;
   let mode = 'select';
   let draft = [];
-  let satellite = false;
+  let satellite = true;
   const layers = L.layerGroup();
   const draftLayer = L.layerGroup();
 
-  // Reemplaza la constante 'osm' por esta:
-  const osm = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-  maxZoom: 18,
-  attribution: 'Teselas Esri World Imagery'
-});
+  const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap'
+  });
   const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Teselas Esri World Imagery (demostración)'
+    maxZoom: 18,
+    attribution: 'Teselas Esri World Imagery'
   });
 
   const map = L.map('farm-map', { doubleClickZoom: false }).setView([-33.687, -71.21], 15);
-  osm.addTo(map);
+  sat.addTo(map);
   layers.addTo(map);
   draftLayer.addTo(map);
+
+  document.getElementById('predio-zone').innerHTML = AgroService.getZonas().map((name) => '<option>' + name + '</option>').join('');
 
   function plotsOfPredio() {
     return AgroService.getPlots(predioId);
@@ -38,6 +49,10 @@
 
   function selected() {
     return plotsOfPredio().find((plot) => plot.id === plotId) || null;
+  }
+
+  function currentPredio() {
+    return state.predios.find((item) => item.id === predioId);
   }
 
   function toLatLngs(coords) {
@@ -56,18 +71,56 @@
     return { areaM2, areaHa: areaM2 / 10000 };
   }
 
+  function cropColor(name) {
+    return CROP_COLORS[name] || { stroke: '#235d37', fill: '#a6c98c' };
+  }
+
+  function fillVarieties(select, crop, current) {
+    const zone = currentPredio()?.zone;
+    const list = AgroService.getVariedades(crop, zone);
+    const options = ['<option value="">Sin variedad</option>'].concat(
+      list.map((item) => '<option value="' + item.name + '">' + item.name + (item.zone ? ' · ' + item.zone : '') + '</option>')
+    );
+    select.innerHTML = options.join('');
+    if (current) select.value = current;
+    if (current && !select.value) {
+      select.insertAdjacentHTML('beforeend', '<option value="' + current + '">' + current + '</option>');
+      select.value = current;
+    }
+  }
+
+  function renderSwitch() {
+    document.getElementById('predio-switch').innerHTML = state.predios.map((item) =>
+      '<button type="button" class="' + (item.id === predioId ? 'is-active' : '') + '" data-predio="' + item.id + '">' +
+      '<strong>' + item.name + '</strong><small>' + (item.zone || item.location || '') + ' · ' + AgroService.fmt(item.area, 1) + ' ha</small></button>'
+    ).join('');
+  }
+
+  function renderLegend() {
+    const used = [...new Set(plotsOfPredio().map((plot) => plot.crop).filter(Boolean))];
+    document.getElementById('map-legend').innerHTML = used.map((name) => {
+      const color = cropColor(name);
+      return '<span><i style="background:' + color.fill + ';border-color:' + color.stroke + '"></i>' + name + '</span>';
+    }).join('');
+  }
+
   function renderMap(fit) {
     layers.clearLayers();
-    state.plots.forEach((plot) => {
+    const visible = state.plots.filter((plot) => plot.predio === predioId);
+    visible.forEach((plot) => {
       const active = plot.id === plotId;
+      const color = cropColor(plot.crop);
       const polygon = L.polygon(toLatLngs(plot.coordinates), {
-        color: active ? '#235d37' : '#679369',
-        weight: active ? 3 : 2,
-        fillColor: active ? '#75a459' : '#a6c98c',
-        fillOpacity: active ? 0.38 : 0.22
+        color: active ? color.stroke : color.stroke,
+        weight: active ? 3.5 : 2,
+        fillColor: color.fill,
+        fillOpacity: active ? 0.5 : 0.28
       }).addTo(layers);
-      const predio = state.predios.find((item) => item.id === plot.predio);
-      polygon.bindTooltip((predio ? predio.name + ' · ' : '') + plot.name, { sticky: true });
+      polygon.bindTooltip(
+        '<strong>' + plot.name + '</strong><br>' + (plot.crop || 'Sin cultivo') +
+        (plot.variety ? ' · ' + plot.variety : '') + '<br>' + AgroService.fmt(plot.areaHa, 2) + ' ha',
+        { sticky: true, className: 'plot-tip' }
+      );
       polygon.on('click', (event) => {
         if (mode === 'select') {
           predioId = plot.predio;
@@ -79,7 +132,7 @@
         }
       });
     });
-    const points = state.plots.flatMap((plot) => toLatLngs(plot.coordinates));
+    const points = visible.flatMap((plot) => toLatLngs(plot.coordinates));
     if (fit && points.length) map.fitBounds(points, { padding: [36, 36], maxZoom: 17 });
   }
 
@@ -121,14 +174,33 @@
     live.textContent = '';
   }
 
+  function renderCropInfo(plot) {
+    const box = document.getElementById('crop-info');
+    const info = plot?.crop ? AgroService.getCultivo(plot.crop) : null;
+    if (!info) {
+      box.hidden = true;
+      box.innerHTML = '';
+      return;
+    }
+    const cal = AgroService.getCalendario(currentPredio()?.zone, plot.crop)[0];
+    box.hidden = false;
+    box.innerHTML = '<h3>' + info.name + (plot.variety ? ' · ' + plot.variety : '') + '</h3>' +
+      '<p>' + (info.description || '') + '</p>' +
+      '<p class="muted">Densidad ' + AgroService.fmt(info.density) + ' ' + (info.unit || 'kg') + '/ha · ' +
+      'rendimiento ' + AgroService.fmt(info.yield, 1) + ' t/ha' +
+      (info.cycleDays ? ' · ciclo ' + info.cycleDays + ' días' : '') + '</p>' +
+      (cal ? '<p class="muted">Siembra ' + AgroService.monthRange(cal.sowStart, cal.sowEnd) + ' · cosecha ' + AgroService.monthRange(cal.harvestStart, cal.harvestEnd) + '</p>' : '');
+  }
+
   function renderSummary() {
     const plot = selected();
-    const predio = state.predios.find((item) => item.id === predioId);
+    const predio = currentPredio();
     const box = document.getElementById('summary');
     const tools = document.getElementById('plot-tools');
     if (!plot) {
       tools.hidden = true;
       box.innerHTML = '<p class="muted">Toca un potrero en el mapa, o dibuja uno y pulsa Listo.</p>';
+      document.getElementById('crop-info').hidden = true;
       return;
     }
     tools.hidden = false;
@@ -136,17 +208,18 @@
     const areaHa = plot.areaHa || metrics.areaHa;
     const areaM2 = areaHa * 10000;
     box.innerHTML = '<div class="summary-grid">' +
-      [['Nombre', plot.name], ['Predio', predio?.name || ''], ['Ubicación', predio?.location || ''],
+      [['Nombre', plot.name], ['Predio', predio?.name || ''], ['Zona', predio?.zone || predio?.location || ''],
         ['Superficie m²', AgroService.fmt(areaM2)], ['Superficie ha', AgroService.fmt(areaHa, 3)],
         ['Cultivo', plot.crop || 'Sin cultivo'], ['Variedad', plot.variety || '—'],
         ['Estado', plot.status || '—'], ['Fecha de siembra', plot.sowing || '—']].map(([label, value]) =>
         '<div><span class="muted">' + label + '</span><strong>' + value + '</strong></div>'
       ).join('') + '</div>';
     document.getElementById('plan-crop').value = plot.crop || 'Maíz';
-    document.getElementById('plan-variety').value = plot.variety || '';
+    fillVarieties(document.getElementById('plan-variety'), document.getElementById('plan-crop').value, plot.variety || '');
     document.getElementById('plan-sowing').value = plot.sowing || '';
     document.getElementById('plan-harvest').value = plot.harvest || '';
     document.getElementById('plan-area').value = Number(areaHa).toFixed(3);
+    renderCropInfo(plot);
   }
 
   function renderActions() {
@@ -158,11 +231,11 @@
       ['water', 'Registrar riego', 'Deja una nota de riego'],
       ['fert', 'Registrar fertilización', 'Deja una nota de fertilizante'],
       ['pest', 'Reportar plaga o problema', 'Queda en tu lista de Inicio'],
-      ['sag', 'Ver recomendaciones / SAG', 'Ficha demostrativa del asesor'],
+      ['sag', 'Ver ficha de insumo', 'Recomendación del catálogo'],
       ['divide', 'Dividir potrero', 'Dibuja un sector dentro del lote']
     ];
-    document.getElementById('zone-actions').innerHTML = actions.map(([id, label, help]) =>
-      '<button type="button" data-act="' + id + '"' + (plot ? '' : ' disabled') + '><strong>' + label + '</strong><small>' + help + '</small></button>'
+    document.getElementById('zone-actions').innerHTML = actions.map(([id, label, helpText]) =>
+      '<button type="button" data-act="' + id + '"' + (plot ? '' : ' disabled') + '><strong>' + label + '</strong><small>' + helpText + '</small></button>'
     ).join('');
   }
 
@@ -248,10 +321,12 @@
 
   function refresh(fit) {
     state = AgroService.getState();
+    renderSwitch();
     renderMap(fit);
+    renderLegend();
+    renderCrops();
     renderSummary();
     renderActions();
-    renderCrops();
     document.querySelectorAll('.map-toolbar [data-mode]').forEach((button) => {
       button.classList.toggle('is-active', button.dataset.mode === mode);
     });
@@ -264,6 +339,13 @@
     if (['draw', 'divide', 'measure'].includes(mode)) addPoint(event.latlng);
   });
 
+  document.getElementById('predio-switch').addEventListener('click', (event) => {
+    const button = event.target.closest('[data-predio]');
+    if (!button) return;
+    predioId = button.dataset.predio;
+    plotId = plotsOfPredio()[0]?.id || null;
+    refresh(true);
+  });
   document.querySelector('.map-toolbar').addEventListener('click', (event) => {
     const modeBtn = event.target.closest('[data-mode]');
     if (modeBtn) setMode(modeBtn.dataset.mode);
@@ -271,12 +353,12 @@
   document.getElementById('toggle-base').addEventListener('click', (event) => {
     satellite = !satellite;
     if (satellite) {
-      map.removeLayer(osm);
+      map.removeLayer(streets);
       sat.addTo(map);
       event.currentTarget.textContent = 'Vista mapa';
     } else {
       map.removeLayer(sat);
-      osm.addTo(map);
+      streets.addTo(map);
       event.currentTarget.textContent = 'Vista satélite';
     }
   });
@@ -287,19 +369,30 @@
     if (id === 'cancel') setMode('select');
   });
   document.getElementById('add-predio').addEventListener('click', () => {
-    const dialog = document.getElementById('predio-dialog');
-    dialog.showModal();
+    document.getElementById('predio-dialog').showModal();
   });
   document.getElementById('predio-form').addEventListener('submit', (event) => {
     if (event.submitter?.value !== 'ok') return;
     const data = new FormData(event.currentTarget);
     const area = AgroService.positive(data.get('area'));
     if (!area) { event.preventDefault(); alert('La superficie debe ser mayor a 0.'); return; }
-    const predio = { id: crypto.randomUUID(), name: data.get('name'), location: data.get('location'), zone: 'Metropolitana', area };
+    const predio = {
+      id: crypto.randomUUID(),
+      name: data.get('name'),
+      location: data.get('location'),
+      zone: data.get('zone') || 'Metropolitana',
+      area
+    };
     AgroService.addPredio(predio);
     predioId = predio.id;
     plotId = null;
     refresh(false);
+  });
+  document.getElementById('plan-crop').addEventListener('change', () => {
+    fillVarieties(document.getElementById('plan-variety'), document.getElementById('plan-crop').value, '');
+  });
+  document.getElementById('crop-select').addEventListener('change', () => {
+    fillVarieties(document.getElementById('crop-variety'), document.getElementById('crop-select').value, '');
   });
   document.getElementById('plan-form').addEventListener('submit', (event) => {
     event.preventDefault();
@@ -321,7 +414,10 @@
     const button = event.target.closest('[data-act]');
     const act = button?.dataset.act;
     if (!act || !selected()) return;
-    if (act === 'crop') document.getElementById('crop-dialog').showModal();
+    if (act === 'crop') {
+      fillVarieties(document.getElementById('crop-variety'), document.getElementById('crop-select').value, selected().variety || '');
+      document.getElementById('crop-dialog').showModal();
+    }
     if (act === 'plan') document.getElementById('plan-crop').focus();
     if (act === 'calc') location.href = '/calculadora/?plot=' + plotId;
     if (act === 'sag') location.href = '/asesor/?crop=' + encodeURIComponent(selected().crop || '');

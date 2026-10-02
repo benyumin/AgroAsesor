@@ -1,10 +1,11 @@
 #tabs { margin: 12px 0; }
 .admin-row {
     display: grid;
-    grid-template-columns: 1.6fr 0.8fr auto auto auto;
+    grid-template-columns: 1fr auto;
     gap: 8px;
     align-items: center;
-    padding: 10px 0;
+    padding: 12px 0;
     border-bottom: 1px solid var(--line);
 }
+.admin-row small { display: block; color: var(--muted); margin-top: 2px; font-weight: 500; }
 @media (max-width: 768px) { .admin-row { grid-template-columns: 1fr; } }

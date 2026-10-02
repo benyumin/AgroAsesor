@@ -3,6 +3,7 @@
   let mode = 'semillas';
   const state = AgroService.getState();
   const plotSelect = document.getElementById('plot');
+  const insumoSelect = document.getElementById('insumo');
   plotSelect.innerHTML = state.plots.map((plot) => {
     const predio = state.predios.find((item) => item.id === plot.predio);
     return '<option value="' + plot.id + '">' + predio.name + ' · ' + plot.name + '</option>';
@@ -19,12 +20,47 @@
     return plot?.areaHa || state.predios.find((item) => item.id === plot?.predio)?.area || 0;
   }
 
-  function currentInsumo() {
-    const plot = selectedPlot();
+  function fillInsumos() {
+    const crop = document.getElementById('crop').value;
+    const list = AgroService.getInsumos(true).filter((item) => item.type !== 'Semilla' && (!crop || item.crop === crop));
+    const fallback = AgroService.getInsumos(true).filter((item) => item.type !== 'Semilla');
+    const source = list.length ? list : fallback;
+    insumoSelect.innerHTML = source.map((item) =>
+      '<option value="' + item.id + '">' + item.name + ' · ' + item.type + ' · ' + item.crop + '</option>'
+    ).join('');
     const wanted = params.get('insumo');
-    const list = AgroService.getInsumos(true);
-    return list.find((item) => AgroService.sameId(item.id, wanted)) ||
-      list.find((item) => item.crop === plot?.crop && item.type !== 'Semilla');
+    if (wanted) insumoSelect.value = wanted;
+  }
+
+  function currentInsumo() {
+    return AgroService.getInsumos(true).find((item) => AgroService.sameId(item.id, insumoSelect.value));
+  }
+
+  function lastPayload() {
+    return AgroService.getResult('calculo-' + mode);
+  }
+
+  function renderStats() {
+    document.getElementById('calc-stats').innerHTML = [
+      ['Cultivos', AgroService.getCultivos().length],
+      ['Semillas en catálogo', (window.AGRO_MOCK.semillas || []).length],
+      ['Insumos vigentes', AgroService.getInsumos(true).length],
+      ['Fuente', AgroService.catalogFromDb() ? 'Base de datos' : 'Demo local']
+    ].map(([label, value]) => '<div class="info-chip"><span>' + label + '</span><strong>' + value + '</strong></div>').join('');
+  }
+
+  function renderNotes() {
+    const crop = AgroService.getCultivo(document.getElementById('crop').value);
+    const box = document.getElementById('crop-notes');
+    if (!crop) { box.innerHTML = ''; return; }
+    const seed = AgroService.getSemilla(crop.name);
+    const insumo = mode === 'insumos' ? currentInsumo() : null;
+    box.innerHTML = '<h2>' + crop.name + '</h2><p>' + (crop.description || '') + '</p>' +
+      '<div class="metric-grid">' +
+      '<div class="metric"><span>Densidad de siembra</span><strong>' + AgroService.fmt(seed?.density || crop.density) + ' ' + (crop.unit || 'kg') + '/ha</strong></div>' +
+      '<div class="metric"><span>Rendimiento ref.</span><strong>' + AgroService.fmt(crop.yield, 1) + ' t/ha</strong></div></div>' +
+      (crop.notes ? '<div class="note-card"><h3>Manejo</h3><p>' + crop.notes + '</p></div>' : '') +
+      (insumo ? '<div class="note-card"><h3>' + insumo.name + '</h3><p>' + (insumo.description || '') + '</p><p class="muted">' + (insumo.application || '') + '</p></div>' : '');
   }
 
   function syncPlot() {
@@ -32,8 +68,9 @@
     if (!plot) return;
     document.getElementById('crop').value = plot.crop || document.getElementById('crop').value;
     document.getElementById('area').value = plot.areaHa || '';
+    fillInsumos();
     if (mode === 'semillas') {
-      const seed = AgroService.getSemilla(plot.crop) || window.AGRO_MOCK.semillas.find((item) => item.crop === plot.crop);
+      const seed = AgroService.getSemilla(document.getElementById('crop').value);
       if (seed) {
         document.getElementById('dose').value = seed.density;
         document.getElementById('unit').value = seed.unit;
@@ -46,11 +83,13 @@
       if (insumo) {
         document.getElementById('dose').value = insumo.dose;
         document.getElementById('unit').value = insumo.unit;
+        document.getElementById('insumo-help').textContent = insumo.type + ' · ' + insumo.dose + ' ' + insumo.unit + '/ha · ' + (insumo.zone || 'Zona Central');
       }
     }
     const fromDb = AgroService.catalogFromDb();
     const extra = fromDb ? ' · Dosis del catálogo (base de datos)' : '';
     document.getElementById('plot-help').textContent = 'Superficie disponible: ' + AgroService.fmt(maxArea(), 3) + ' ha · Cultivo actual: ' + (plot.crop || 'sin cultivo') + extra;
+    renderNotes();
     renderResult(false);
   }
 
@@ -60,10 +99,11 @@
       button.classList.toggle('is-active', button.dataset.mode === mode);
     });
     const seed = mode === 'semillas';
+    document.getElementById('insumo-field').hidden = seed;
     document.getElementById('form-title').textContent = seed ? 'Calcular semillas' : 'Calcular insumo';
     document.getElementById('form-hint').textContent = seed
-      ? 'Elige el potrero. La superficie se completa sola; puedes ajustarla si no vas a sembrar todo.'
-      : 'Usa la dosis de la ficha o la etiqueta. El resultado es la cantidad total para el potrero.';
+      ? 'La densidad sale del cultivo en la base de datos. Ajústala si no vas a sembrar todo el potrero.'
+      : 'Elige el producto del catálogo. La dosis de la ficha se copia sola; puedes cambiarla si la etiqueta dice otra cosa.';
     document.getElementById('dose-label').textContent = seed ? 'Dosis o densidad por hectárea' : 'Dosis recomendada por hectárea';
     document.getElementById('dose-help').textContent = seed ? 'Kilos de semilla por cada hectárea.' : 'Cantidad de producto por cada hectárea.';
     syncPlot();
@@ -74,13 +114,25 @@
     return '<div class="bags" aria-hidden="true">' + Array.from({ length: count }, () => '<b></b>').join('') + '</div>';
   }
 
+  function buildPayload(area, dose, unit, amount) {
+    const plot = selectedPlot();
+    const predio = plotSelect.selectedOptions[0]?.text || '';
+    const insumo = mode === 'insumos' ? currentInsumo() : null;
+    return {
+      mode, area, dose, unit, amount,
+      predio, crop: document.getElementById('crop').value,
+      insumo: insumo?.name || '',
+      type: insumo?.type || 'Semilla',
+      date: new Date().toISOString()
+    };
+  }
+
   function renderResult(save) {
     const errorBox = document.getElementById('calc-error');
     const area = AgroService.positive(document.getElementById('area').value);
     const dose = AgroService.positive(document.getElementById('dose').value);
     const unit = document.getElementById('unit').value || 'kg';
     const max = maxArea();
-    const plot = selectedPlot();
     const predio = plotSelect.selectedOptions[0]?.text || '';
     errorBox.textContent = '';
 
@@ -98,29 +150,74 @@
       return false;
     }
     const result = AgroService.calculateDose(area, dose);
-    const payload = {
-      mode, area, dose, unit, amount: result.amount,
-      predio, crop: document.getElementById('crop').value,
-      date: new Date().toISOString()
-    };
+    const payload = buildPayload(area, dose, unit, result.amount);
     if (save) AgroService.saveResult('calculo-' + mode, payload);
+    const bagsNote = unit === 'kg' ? '<p class="muted">Cada saco dibujado representa unos 25 kg, solo como referencia visual.</p>' : '';
     document.getElementById('result').innerHTML =
       '<p class="result-kicker">' + (mode === 'semillas' ? 'Semilla necesaria' : 'Insumo necesario') + '</p>' +
       '<p class="result-value">' + AgroService.fmt(result.amount) + ' ' + unit + '</p>' +
-      '<p>Para <strong>' + predio + '</strong> · ' + document.getElementById('crop').value + '</p>' +
-      bags(result.amount) +
+      '<p>Para <strong>' + predio + '</strong> · ' + document.getElementById('crop').value +
+      (payload.insumo ? ' · ' + payload.insumo : '') + '</p>' +
+      bags(result.amount) + bagsNote +
       '<div class="formula-box"><p class="formula-line">Cantidad = superficie × dosis</p><p>' +
       AgroService.fmt(area) + ' ha × ' + AgroService.fmt(dose) + ' ' + unit + '/ha = <strong>' + AgroService.fmt(result.amount) + ' ' + unit + '</strong></p></div>' +
       '<div class="metric-grid"><div class="metric"><span>Superficie</span><strong>' + AgroService.fmt(area, 3) + ' ha</strong></div>' +
       '<div class="metric"><span>Dosis</span><strong>' + AgroService.fmt(dose) + ' ' + unit + '/ha</strong></div></div>' +
-      '<div class="next-links"><a class="button secondary" href="/cobertura/">¿Me alcanza para cubrir el terreno?</a></div>';
+      '<div class="next-links"><a class="button secondary" href="/cobertura/?insumo=' + (currentInsumo()?.id || '') + '">¿Me alcanza para cubrir el terreno?</a></div>';
     return true;
   }
 
+  function downloadLast() {
+    const data = lastPayload() || buildPayload(
+      AgroService.positive(document.getElementById('area').value),
+      AgroService.positive(document.getElementById('dose').value),
+      document.getElementById('unit').value,
+      AgroService.positive(document.getElementById('area').value) * AgroService.positive(document.getElementById('dose').value)
+    );
+    if (!data || !data.amount) {
+      alert('Calcula primero para descargar el PDF.');
+      return;
+    }
+    AgroService.downloadPdf('calculo-' + mode + '.pdf', mode === 'semillas' ? 'Cálculo de semillas' : 'Cálculo de insumos', [
+      { heading: data.predio },
+      { label: 'Cultivo', value: data.crop },
+      { label: 'Producto', value: data.insumo || 'Semilla del catálogo' },
+      { label: 'Superficie', value: AgroService.fmt(data.area, 3) + ' ha' },
+      { label: 'Dosis', value: AgroService.fmt(data.dose) + ' ' + data.unit + '/ha' },
+      { label: 'Cantidad a llevar', value: AgroService.fmt(data.amount) + ' ' + data.unit }
+    ]);
+  }
+
   plotSelect.addEventListener('change', syncPlot);
-  ['area', 'dose', 'unit', 'crop'].forEach((id) => {
+  document.getElementById('crop').addEventListener('change', () => {
+    if (mode === 'semillas') {
+      const seed = AgroService.getSemilla(document.getElementById('crop').value);
+      if (seed) {
+        document.getElementById('dose').value = seed.density;
+        document.getElementById('unit').value = seed.unit;
+      }
+    } else {
+      fillInsumos();
+      const insumo = currentInsumo();
+      if (insumo) {
+        document.getElementById('dose').value = insumo.dose;
+        document.getElementById('unit').value = insumo.unit;
+      }
+    }
+    renderNotes();
+    renderResult(false);
+  });
+  insumoSelect.addEventListener('change', () => {
+    const insumo = currentInsumo();
+    if (insumo) {
+      document.getElementById('dose').value = insumo.dose;
+      document.getElementById('unit').value = insumo.unit;
+    }
+    renderNotes();
+    renderResult(false);
+  });
+  ['area', 'dose', 'unit'].forEach((id) => {
     document.getElementById(id).addEventListener('input', () => renderResult(false));
-    document.getElementById(id).addEventListener('change', () => renderResult(false));
   });
   document.getElementById('modes').addEventListener('click', (event) => {
     const button = event.target.closest('button[data-mode]');
@@ -140,9 +237,14 @@
     if (renderResult(true)) {
       const note = document.createElement('p');
       note.className = 'callout';
-      note.textContent = 'Cálculo guardado. Ya puedes exportarlo en Reportes PDF.';
+      note.textContent = 'Cálculo guardado. Ya puedes exportarlo en PDF desde aquí o en Reportes.';
       document.getElementById('result').appendChild(note);
     }
   });
+  document.getElementById('pdf-calc').addEventListener('click', () => {
+    renderResult(true);
+    downloadLast();
+  });
+  renderStats();
   setMode(params.get('insumo') ? 'insumos' : 'semillas');
 })();

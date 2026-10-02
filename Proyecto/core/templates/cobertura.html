@@ -1,16 +1,16 @@
 {% extends "body.html" %}
 {% load static %}
 {% block title %}Cobertura del terreno · AgroAsesor{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/cobertura.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/cobertura.css' %}?v=3">{% endblock %}
 {% block content %}
 <div class="page-hero">
     <div>
         <h1 class="page-title">Si te alcanza</h1>
-        <p class="page-sub">Verde es lo que cubres con lo que tienes. Gris es lo que todavía falta.</p>
+        <p class="page-sub">Compara lo que hay en bodega con la dosis del catálogo. Verde es lo cubierto; gris, lo que falta.</p>
     </div>
     <a class="button secondary" href="{% url 'calculadora' %}">Calcular la dosis primero</a>
 </div>
-
+<div class="info-strip" id="cover-stats"></div>
 <div class="split-layout">
     <form class="card" id="cover-form">
         <h2>Datos del terreno y del producto</h2>
@@ -19,13 +19,13 @@
             <select id="plot"></select>
             <small class="help" id="plot-help">Superficie del potrero seleccionado.</small>
         </label>
-        <label class="field"><span>Insumo</span>
+        <label class="field"><span>Insumo del catálogo</span>
             <select id="insumo"></select>
             <small class="help" id="insumo-help">Ficha demostrativa. No es una receta real.</small>
         </label>
         <div class="grid-2">
             <label class="field"><span>Dosis recomendada (por ha)</span>
-                <input id="dose" type="number" min="0.01" step="0.01" required>
+                <input id="dose" type="number" min="0.01" step="0.001" required>
                 <small class="help">Cuánto se aplica en una hectárea.</small>
             </label>
             <label class="field"><span>Cantidad que tienes ahora</span>
@@ -41,10 +41,11 @@
         </div>
         <p class="error" id="cover-error" role="alert"></p>
         <div class="toolbar">
-            <a class="button secondary" href="{% url 'reportes' %}">Guardar este resultado en PDF</a>
+            <button class="button" type="button" id="pdf-cover">Descargar PDF</button>
+            <a class="button secondary" href="{% url 'reportes' %}">Ver en Reportes</a>
         </div>
+        <div class="note-card" id="insumo-card"></div>
     </form>
-
     <section class="card cover-board" aria-live="polite">
         <div class="cover-head">
             <div>
@@ -64,4 +65,7 @@
     </section>
 </div>
 {% endblock %}
-{% block extra_js %}<script src="{% static 'js/cobertura.js' %}"></script>{% endblock %}
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="{% static 'js/cobertura.js' %}?v=3"></script>
+{% endblock %}

@@ -58,6 +58,18 @@ class CatalogSliceTests(TestCase):
         maize = next(item for item in catalog['cultivos'] if item['name'] == 'Maíz')
         self.assertEqual(maize['density'], 25.0)
 
+    def test_catalog_includes_pests_calendar_and_inputs(self):
+        response = self.client.get('/asesor/')
+        catalog = response.context['catalog']
+        problems = [item['name'] for item in catalog['problemas']]
+        self.assertIn('Gusano cogollero', problems)
+        self.assertIn('Tizón tardío', problems)
+        crops = [item['crop'] for item in catalog['calendario']]
+        self.assertIn('Maíz', crops)
+        names = [item['name'] for item in catalog['insumos']]
+        self.assertIn('Urea 46% demostrativa', names)
+        self.assertIn('Insecticida cogollero demostrativo', names)
+
     def test_calculator_page_receives_seed_catalog(self):
         response = self.client.get('/calculadora/')
         self.assertEqual(response.status_code, 200)
@@ -66,3 +78,9 @@ class CatalogSliceTests(TestCase):
         seeds = {item['crop']: item['density'] for item in payload['semillas']}
         self.assertEqual(seeds['Maíz'], 25.0)
         self.assertEqual(seeds['Trigo'], 160.0)
+
+    def test_calendar_and_ficha_pages_load(self):
+        for path in ('/calendario/', '/asesor/', '/predios/', '/cobertura/', '/reportes/', '/busqueda/'):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200, path)
+            self.assertTrue(response.context['catalog']['fromDb'])

@@ -20,13 +20,24 @@
   function applyCatalog(state, catalog) {
     if (!catalog || !catalog.fromDb) return state;
     if (catalog.cultivos) state.cultivos = catalog.cultivos;
-    if (catalog.zonas) state.zonas = catalog.zonas;
     if (catalog.insumos) state.insumos = catalog.insumos;
-    window.AGRO_MOCK.cultivos = (catalog.cultivos || []).filter((item) => item.active !== false).map((item) => item.name);
-    if (catalog.zonas) window.AGRO_MOCK.zonas = catalog.zonas.map((item) => item.name);
+    if (catalog.problemas) state.problemas = catalog.problemas;
+    if (catalog.variedades) state.variedades = catalog.variedades;
+    if (catalog.calendario) state.calendario = catalog.calendario;
+    if (catalog.zonas) {
+      state.zonas = catalog.zonas.map((name, index) => ({ id: 'z' + index, name, active: true }));
+      window.AGRO_MOCK.zonas = catalog.zonas.slice();
+    }
+    window.AGRO_MOCK.cultivos = (catalog.cultivos || [])
+      .filter((item) => item.active !== false)
+      .map((item) => item.name);
     if (catalog.insumos) window.AGRO_MOCK.insumos = catalog.insumos;
+    if (catalog.problemas) window.AGRO_MOCK.problemas = catalog.problemas;
+    if (catalog.variedades) window.AGRO_MOCK.variedades = catalog.variedades;
+    if (catalog.calendario) window.AGRO_MOCK.calendario = catalog.calendario;
     if (catalog.semillas && catalog.semillas.length) window.AGRO_MOCK.semillas = catalog.semillas;
     if (catalog.yields) window.AGRO_MOCK.yields = catalog.yields;
+    if (catalog.disclaimer) window.AGRO_MOCK.disclaimer = catalog.disclaimer;
     window.AGRO_CATALOG = catalog;
     return state;
   }
@@ -37,11 +48,9 @@
       plots: clone(window.AGRO_MOCK.plots),
       activities: clone(window.AGRO_MOCK.activities),
       cultivos: clone(window.AGRO_MOCK.cultivos).map((name, i) => ({ id: 'c' + i, name, active: true })),
-      variedades: [
-        { id: 'v1', name: 'Híbrido demo', active: true },
-        { id: 'v2', name: 'Industrial demo', active: true },
-        { id: 'v3', name: 'Demo invierno', active: true }
-      ],
+      variedades: clone(window.AGRO_MOCK.variedades || []).map((item, i) => (
+        typeof item === 'string' ? { id: 'v' + i, name: item, active: true } : { active: true, ...item, id: item.id || 'v' + i }
+      )),
       zonas: clone(window.AGRO_MOCK.zonas).map((name, i) => ({ id: 'z' + i, name, active: true })),
       insumos: clone(window.AGRO_MOCK.insumos),
       problemas: clone(window.AGRO_MOCK.problemas),
@@ -121,7 +130,8 @@
 
   function predictYield(crop, areaHa) {
     const area = positive(areaHa);
-    const rate = window.AGRO_MOCK.yields[crop];
+    const info = getCultivo(crop);
+    const rate = (info && info.yield) || window.AGRO_MOCK.yields[crop];
     if (area === null) return { ok: false, error: 'La superficie debe ser mayor a 0.' };
     if (!rate) return { ok: false, error: 'Selecciona un cultivo.' };
     return { ok: true, rate, production: rate * area, confidence: 'Media (datos de referencia, no un modelo real).' };
@@ -131,21 +141,113 @@
     return String(left) === String(right);
   }
 
+  function getCultivo(name) {
+    return load().cultivos.find((item) => (item.name || item) === name) || null;
+  }
+
+  function getVariedades(crop, zone) {
+    return (load().variedades || []).filter((item) => {
+      if (item.active === false) return false;
+      if (crop && item.crop && item.crop !== crop) return false;
+      if (zone && item.zone && item.zone !== zone) return false;
+      return true;
+    });
+  }
+
+  function getCalendario(zone, crop) {
+    return (load().calendario || []).filter((item) => {
+      if (item.active === false) return false;
+      if (zone && item.zone && item.zone !== zone) return false;
+      if (crop && item.crop && item.crop !== crop) return false;
+      return true;
+    });
+  }
+
+  function monthName(month) {
+    return ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][month - 1] || '';
+  }
+
+  function monthRange(start, end) {
+    if (!start || !end) return '—';
+    if (start === end) return monthName(start);
+    return monthName(start) + ' – ' + monthName(end);
+  }
+
+  function wrapText(doc, text, x, y, maxWidth, lineHeight) {
+    const lines = doc.splitTextToSize(String(text || ''), maxWidth);
+    lines.forEach((line) => {
+      if (y > 280) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(line, x, y);
+      y += lineHeight;
+    });
+    return y;
+  }
+
+  function downloadPdf(filename, title, rows) {
+    if (!window.jspdf) {
+      alert('No se pudo cargar el generador de PDF.');
+      return false;
+    }
+    const doc = new window.jspdf.jsPDF();
+    doc.setFillColor(35, 93, 55);
+    doc.rect(0, 0, 210, 22, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.text('AgroAsesor', 14, 14);
+    doc.setFontSize(10);
+    doc.text('Zona Central · demostración', 150, 14);
+    doc.setTextColor(30, 40, 32);
+    doc.setFontSize(14);
+    let y = 34;
+    y = wrapText(doc, title, 14, y, 180, 7);
+    doc.setFontSize(10);
+    y += 4;
+    (rows || []).forEach((row) => {
+      if (!row) return;
+      if (row.heading) {
+        y += 3;
+        doc.setFont(undefined, 'bold');
+        y = wrapText(doc, row.heading, 14, y, 180, 6);
+        doc.setFont(undefined, 'normal');
+        return;
+      }
+      const line = row.label ? (row.label + ': ' + (row.value ?? '')) : String(row.value ?? row);
+      y = wrapText(doc, line, 14, y, 180, 6);
+    });
+    y += 8;
+    doc.setFontSize(8);
+    doc.setTextColor(90, 90, 90);
+    wrapText(doc, window.AGRO_MOCK.disclaimer, 14, y, 180, 4.5);
+    doc.save(filename);
+    return true;
+  }
+
   const api = {
     getState: load,
     saveState: save,
     catalogFromDb: () => Boolean(readServerCatalog()),
+    getCatalog: () => readServerCatalog() || {},
     getPredios: () => load().predios,
     getPlots: (predioId) => load().plots.filter((plot) => !predioId || plot.predio === predioId),
     getCultivos: () => load().cultivos.filter((item) => item.active !== false).map((item) => item.name || item),
+    getCultivo,
     getSemilla(crop) {
       return (window.AGRO_MOCK.semillas || []).find((item) => item.crop === crop) || null;
     },
     getInsumos: (onlyActive) => load().insumos.filter((item) => !onlyActive || item.active),
     getProblemas: () => load().problemas.filter((item) => item.active !== false),
+    getVariedades,
+    getCalendario,
+    getZonas: () => (readServerCatalog()?.zonas || window.AGRO_MOCK.zonas || []),
+    monthName,
+    monthRange,
     calculateCoverage,
     calculateDose,
     predictYield,
+    downloadPdf,
     fmt,
     positive,
     nonNegative,

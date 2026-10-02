@@ -1,17 +1,17 @@
 {% extends "body.html" %}
 {% load static %}
 {% block title %}Búsqueda · AgroAsesor{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/busqueda.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/busqueda.css' %}?v=3">{% endblock %}
 {% block content %}
 <div class="page-hero">
     <div>
-        <h1 class="page-title">Buscar</h1>
-        <p class="page-sub">Predios, cultivos, semillas e insumos. “mai” encuentra Maíz.</p>
+        <h1 class="page-title">Buscar en el catálogo</h1>
+        <p class="page-sub">Cultivos, variedades, plagas, fertilizantes, insecticidas y predios. “mai” encuentra Maíz; “gusano” encuentra cogollero.</p>
     </div>
 </div>
 <form class="card" id="search-form">
     <div class="grid-2">
-        <label class="field"><span>Buscar</span><input id="term" value="{{ query }}" placeholder="mai, maíz, gusano, santa…"></label>
+        <label class="field"><span>Buscar</span><input id="term" value="{{ query }}" placeholder="mai, maíz, gusano, urea, santa…"></label>
         <label class="field"><span>Cultivo</span><select id="crop"><option value="">Todos</option></select></label>
         <label class="field"><span>Problema</span><select id="problem"><option value="">Todos</option></select></label>
         <label class="field"><span>Tipo de insumo</span><select id="type"><option value="">Todos</option></select></label>
@@ -19,10 +19,13 @@
     <div class="example-row">
         <button class="example-chip" type="button" data-q="mai">mai</button>
         <button class="example-chip" type="button" data-q="gusano">gusano</button>
+        <button class="example-chip" type="button" data-q="urea">urea</button>
+        <button class="example-chip" type="button" data-q="tizon">tizón</button>
         <button class="example-chip" type="button" data-q="santa">santa</button>
     </div>
     <button class="button" type="submit">Buscar</button>
 </form>
+<p class="muted" id="result-count"></p>
 <div id="results" class="results"></div>
 {% endblock %}
-{% block extra_js %}<script src="{% static 'js/busqueda.js' %}"></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'js/busqueda.js' %}?v=3"></script>{% endblock %}

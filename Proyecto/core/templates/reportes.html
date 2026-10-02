@@ -1,12 +1,12 @@
 {% extends "body.html" %}
 {% load static %}
 {% block title %}Reportes PDF · AgroAsesor{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/reportes.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/reportes.css' %}?v=3">{% endblock %}
 {% block content %}
 <div class="page-hero">
     <div>
         <h1 class="page-title">Reporte</h1>
-        <p class="page-sub">Descarga el último cálculo, la cobertura o la ficha que guardaste.</p>
+        <p class="page-sub">Descarga el último cálculo, la cobertura, la ficha o la estimación de cosecha. El PDF lleva encabezado AgroAsesor y el aviso de demostración.</p>
     </div>
 </div>
 <div class="split-layout">
@@ -18,17 +18,22 @@
                 <option value="calculo-semillas">Cálculo de semillas</option>
                 <option value="calculo-insumos">Cálculo de insumos</option>
                 <option value="cobertura">Cobertura del terreno</option>
+                <option value="predictor">Estimación de cosecha</option>
+                <option value="calendario">Calendario de siembra</option>
             </select>
         </label>
-        <button class="button" type="button" id="pdf-btn">Exportar PDF</button>
+        <p class="hint">Si el recuadro de la derecha está vacío, primero genera el cálculo o la ficha en su página. Luego vuelve aquí o descarga el PDF desde esa misma pantalla.</p>
+        <div class="toolbar">
+            <button class="button" type="button" id="pdf-btn">Exportar PDF</button>
+        </div>
     </form>
     <section class="card preview" id="preview">
         <h2>Vista previa</h2>
-        <p class="muted">Pulsa “Mostrar vista previa” para ver el contenido antes de descargar.</p>
+        <p class="muted">Elige un tipo de reporte para ver el contenido antes de descargar.</p>
     </section>
 </div>
 {% endblock %}
 {% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
-<script src="{% static 'js/reportes.js' %}"></script>
+<script src="{% static 'js/reportes.js' %}?v=3"></script>
 {% endblock %}

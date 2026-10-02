@@ -1,25 +1,32 @@
 {% extends "body.html" %}
 {% load static %}
 {% block title %}Calendario de siembra · AgroAsesor{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/calendario.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/calendario.css' %}?v=3">{% endblock %}
 {% block content %}
 <div class="page-hero">
     <div>
         <h1 class="page-title">Cuándo sembrar</h1>
-        <p class="page-sub">Verde siembra, amarillo crecimiento, café cosecha. Zona Central, datos de demostración.</p>
+        <p class="page-sub">Ventanas de siembra y cosecha por zona y variedad, según el catálogo. Verde siembra, ámbar crecimiento, café cosecha. Datos de demostración para Zona Central.</p>
     </div>
 </div>
-<div class="card grid-3 cal-filters">
-    <label class="field"><span>Cultivo</span><select id="crop-filter"><option value="">Todos</option></select></label>
-    <label class="field"><span>Año</span><select id="year"><option>2026</option><option>2027</option></select></label>
+<div class="info-strip" id="cal-stats"></div>
+<div class="card cal-filters">
     <label class="field"><span>Zona</span><select id="zone"></select></label>
+    <label class="field"><span>Cultivo</span><select id="crop-filter"><option value="">Todos los cultivos</option></select></label>
+    <label class="field"><span>Año de referencia</span><select id="year"><option>2026</option><option>2027</option></select></label>
 </div>
-<div class="split-layout">
-    <div class="cal-scroll card">
-        <p class="legend cal-legend"><span class="cell sow"></span> Siembra <span class="cell grow"></span> Crecimiento <span class="cell harvest"></span> Cosecha</p>
-        <table class="cal-table" id="cal-table"></table>
-    </div>
+<div class="cal-legend-row">
+    <span><i class="swatch sow"></i> Siembra</span>
+    <span><i class="swatch grow"></i> Crecimiento</span>
+    <span><i class="swatch harvest"></i> Cosecha</span>
+    <span><i class="swatch idle"></i> Fuera de ventana</span>
+</div>
+<div class="split-layout cal-layout">
+    <div class="cal-scroll card" id="cal-board"></div>
     <aside class="card" id="cal-detail"></aside>
 </div>
 {% endblock %}
-{% block extra_js %}<script src="{% static 'js/calendario.js' %}"></script>{% endblock %}
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="{% static 'js/calendario.js' %}?v=3"></script>
+{% endblock %}

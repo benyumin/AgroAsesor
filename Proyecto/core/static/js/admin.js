@@ -1,24 +1,48 @@
 (function () {
   const sections = [
-    { id: 'cultivos', label: 'Cultivos', fields: ['name'] },
-    { id: 'variedades', label: 'Variedades', fields: ['name'] },
-    { id: 'zonas', label: 'Zonas', fields: ['name'] },
-    { id: 'insumos', label: 'Insumos', fields: ['name', 'crop', 'problem', 'type', 'dose', 'unit'] },
-    { id: 'problemas', label: 'Problemas agrícolas', fields: ['name'] },
-    { id: 'calendario', label: 'Calendario', fields: ['name', 'sow', 'cycle', 'notes'] }
+    { id: 'cultivos', label: 'Cultivos' },
+    { id: 'variedades', label: 'Variedades' },
+    { id: 'problemas', label: 'Plagas y problemas' },
+    { id: 'insumos', label: 'Insumos' },
+    { id: 'calendario', label: 'Calendarios' },
+    { id: 'zonas', label: 'Zonas' }
   ];
   let current = 'cultivos';
-  const stats = window.AGRO_MOCK.adminStats;
+  const state = AgroService.getState();
+  const fromDb = AgroService.catalogFromDb();
 
   document.getElementById('admin-stats').innerHTML = [
-    ['Agricultores registrados', stats.agricultores],
-    ['Cultivos registrados', stats.cultivos],
-    ['Insumos registrados', stats.insumos],
-    ['Consultas realizadas', stats.consultas]
+    ['Cultivos', (state.cultivos || []).length],
+    ['Insumos', (state.insumos || []).length],
+    ['Problemas', (state.problemas || []).length],
+    ['Calendarios', (state.calendario || []).length]
   ].map(([label, value]) => '<article class="card"><span class="muted">' + label + '</span><strong class="stat-value">' + value + '</strong></article>').join('');
 
   function items() {
-    return AgroService.getState()[current] || [];
+    const data = AgroService.getState()[current] || [];
+    if (current === 'zonas') {
+      return AgroService.getZonas().map((name, index) => ({ id: 'z' + index, name, active: true }));
+    }
+    return data;
+  }
+
+  function titleOf(item) {
+    return item.name || item.crop || item.id;
+  }
+
+  function detailOf(item) {
+    if (current === 'cultivos') {
+      return (item.family || '') + ' · ' + (item.density || '—') + ' ' + (item.unit || 'kg') + '/ha · ' + (item.yield || '—') + ' t/ha';
+    }
+    if (current === 'insumos') {
+      return (item.type || '') + ' · ' + (item.crop || '') + (item.problem ? ' · ' + item.problem : '') + ' · ' + (item.dose || '') + ' ' + (item.unit || '') + '/ha';
+    }
+    if (current === 'problemas') return (item.type || '') + ' · ' + (item.description || '').slice(0, 80);
+    if (current === 'variedades') return (item.crop || '') + (item.zone ? ' · ' + item.zone : '');
+    if (current === 'calendario') {
+      return (item.crop || '') + ' · ' + (item.zone || '') + ' · siembra ' + AgroService.monthRange(item.sowStart || item.sow, item.sowEnd || item.sow);
+    }
+    return item.name || '';
   }
 
   function renderTabs() {
@@ -27,63 +51,29 @@
     ).join('');
   }
 
-  function renderForm() {
-    const labels = { name: 'Nombre', crop: 'Cultivo', problem: 'Problema', type: 'Tipo', dose: 'Dosis', unit: 'Unidad', sow: 'Mes de siembra', cycle: 'Ciclo (meses)', notes: 'Notas' };
-    const section = sections.find((item) => item.id === current);
-    const title = document.getElementById('admin-title');
-    if (title) title.textContent = section.label;
-    document.getElementById('create-form').innerHTML = section.fields.map((field) =>
-      '<label class="field"><span>' + (labels[field] || field) + '</span><input name="' + field + '" required></label>'
-    ).join('') + '<button class="button" type="submit">Crear</button>';
-  }
-
   function renderTable() {
+    const section = sections.find((item) => item.id === current);
+    document.getElementById('admin-title').textContent = section.label;
+    document.getElementById('admin-hint').textContent = fromDb
+      ? 'Estos registros vienen de la base de datos y alimentan las pantallas del agricultor. Para crear o editar, usa Django Admin.'
+      : 'Catálogo de demostración local. Ejecuta seed_catalog para cargar la base.';
     document.getElementById('table').innerHTML = items().map((item) =>
-      '<div class="admin-row"><strong>' + (item.name || item.id) + '</strong><span class="badge ' + (item.active === false ? 'amber' : '') + '">' +
+      '<div class="admin-row"><div><strong>' + titleOf(item) + '</strong><small>' + detailOf(item) + '</small></div>' +
+      '<span class="badge ' + (item.active === false ? 'amber' : '') + '">' +
       (current === 'insumos' ? (item.active ? 'Vigente' : 'No vigente') : (item.active === false ? 'Inactivo' : 'Activo')) +
-      '</span><button class="button secondary" type="button" data-edit="' + item.id + '">Editar</button>' +
-      '<button class="button secondary" type="button" data-toggle="' + item.id + '">' + (item.active === false ? 'Activar' : 'Desactivar') + '</button>' +
-      '<button class="button secondary" type="button" data-del="' + item.id + '">Eliminar</button></div>'
+      '</span></div>'
     ).join('');
   }
 
   function refresh() {
     renderTabs();
-    renderForm();
     renderTable();
   }
 
   document.getElementById('tabs').addEventListener('click', (event) => {
-    if (!event.target.dataset.sec) return;
-    current = event.target.dataset.sec;
-    refresh();
-  });
-  document.getElementById('create-form').addEventListener('submit', (event) => {
-    event.preventDefault();
-    const data = Object.fromEntries(new FormData(event.currentTarget).entries());
-    if (data.dose && AgroService.positive(data.dose) === null) { alert('La dosis debe ser mayor a 0.'); return; }
-    const list = items();
-    list.push({ id: crypto.randomUUID(), active: true, ...data, dose: data.dose ? Number(data.dose) : undefined });
-    AgroService.replaceCatalog(current, list);
-    event.currentTarget.reset();
-    refresh();
-  });
-  document.getElementById('table').addEventListener('click', (event) => {
-    const list = items();
-    const edit = event.target.dataset.edit;
-    const del = event.target.dataset.del;
-    const toggle = event.target.dataset.toggle;
-    if (edit) {
-      const name = prompt('Nuevo nombre', list.find((item) => item.id === edit)?.name);
-      if (!name) return;
-      AgroService.replaceCatalog(current, list.map((item) => item.id === edit ? { ...item, name } : item));
-    }
-    if (toggle) {
-      AgroService.replaceCatalog(current, list.map((item) => item.id === toggle ? { ...item, active: item.active === false } : item));
-    }
-    if (del && confirm('¿Eliminar este registro?')) {
-      AgroService.replaceCatalog(current, list.filter((item) => item.id !== del));
-    }
+    const button = event.target.closest('[data-sec]');
+    if (!button) return;
+    current = button.dataset.sec;
     refresh();
   });
   refresh();
